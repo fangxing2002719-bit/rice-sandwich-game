@@ -6,15 +6,76 @@
   <title>A Rice Sandwich Game</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+
   <div class="game-container">
-    <h1>A Rice Sandwich</h1>
+
+    <h1>🥪 A Rice Sandwich</h1>
     <h2>Esperanza's Journey</h2>
 
-    <p>Welcome to the game!</p>
+    <p>Help Esperanza reach the school canteen!</p>
 
-    <button>🎲 Roll Dice</button>
+    <div id="board">
+
+      <div class="space">
+        🏠<br>
+        Start
+        <span id="player">🔵</span>
+      </div>
+
+      <div class="space">
+        ❓<br>
+        Question
+      </div>
+
+      <div class="space">
+        🥪<br>
+        Rice Sandwich
+      </div>
+
+      <div class="space">
+        ✉️<br>
+        Mother's Letter
+      </div>
+
+      <div class="space">
+        🏫<br>
+        School
+      </div>
+
+      <div class="space">
+        👩‍🦳<br>
+        The Nun
+      </div>
+
+      <div class="space">
+        📚<br>
+        Sister Superior
+      </div>
+
+      <div class="space">
+        🏢<br>
+        The House
+      </div>
+
+      <div class="space">
+        😢<br>
+        Crying
+      </div>
+
+      <div class="space">
+        🍽️<br>
+        Canteen
+      </div>
+
+    </div>
+
+    <button id="rollButton">🎲 Roll Dice</button>
+
+    <p id="diceResult">Dice: -</p>
+
   </div>
+
 </body>
+
 </html>
