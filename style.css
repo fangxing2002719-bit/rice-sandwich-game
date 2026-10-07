@@ -1,81 +1,304 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f5efe6;
-  text-align: center;
   margin: 0;
   padding: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+
+  background:
+    linear-gradient(135deg, #f8e7c4, #f3c98b, #e6b980);
+
+  min-height: 100vh;
 }
 
 .game-container {
-  max-width: 650px;
+  max-width: 720px;
   margin: auto;
+  padding: 25px 20px 35px;
+
+  background: rgba(255, 255, 255, 0.88);
+
+  border-radius: 28px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
 h1 {
-  margin-bottom: 5px;
-  font-size: 32px;
+  font-size: 36px;
+  margin: 5px 0 3px;
+  color: #55351e;
 }
 
 h2 {
-  margin-top: 0;
+  margin: 0;
+  font-size: 22px;
   font-weight: normal;
+  color: #8b5e3c;
+}
+
+.game-container > p:first-of-type {
+  color: #6b625b;
+  font-size: 16px;
+  margin-top: 12px;
 }
 
 #board {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin: 30px 0;
+
+  gap: 14px;
+
+  margin: 30px 0 25px;
+
+  padding: 18px;
+
+  background: #d2a66f;
+
+  border: 5px solid #8b5e3c;
+  border-radius: 25px;
+
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.15);
 }
 
 .space {
-  background-color: white;
-  border: 3px solid #333;
-  border-radius: 15px;
-  padding: 20px 8px;
-  min-height: 75px;
-  font-size: 18px;
+  position: relative;
+
+  min-height: 105px;
+
+  padding: 15px 10px;
+
+  border-radius: 18px;
+
+  border: 3px solid rgba(0, 0, 0, 0.14);
+
+  background: #fffdf7;
+
+  font-size: 17px;
   font-weight: bold;
+  color: #39312b;
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
+
   align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 5px 10px rgba(0, 0, 0, 0.12);
+
+  transition: transform 0.2s ease;
+}
+
+.space:hover {
+  transform: translateY(-3px);
+}
+
+/* START */
+
+.space:nth-child(1) {
+  background: #d9f3dc;
+  border-color: #74b77a;
+}
+
+/* QUESTION */
+
+.space:nth-child(2) {
+  background: #dcecff;
+  border-color: #6a9bd8;
+}
+
+/* SANDWICH */
+
+.space:nth-child(3) {
+  background: #fff0b8;
+  border-color: #e2b946;
+}
+
+/* LETTER */
+
+.space:nth-child(4) {
+  background: #fff7e3;
+  border-color: #d6a95c;
+}
+
+/* SCHOOL */
+
+.space:nth-child(5) {
+  background: #dbefff;
+  border-color: #7aa9cf;
+}
+
+/* NUN */
+
+.space:nth-child(6) {
+  background: #eee7ff;
+  border-color: #947bc5;
+}
+
+/* SISTER SUPERIOR */
+
+.space:nth-child(7) {
+  background: #eadfff;
+  border-color: #8e70bf;
+}
+
+/* HOUSE */
+
+.space:nth-child(8) {
+  background: #ffdede;
+  border-color: #c87878;
+}
+
+/* CRYING */
+
+.space:nth-child(9) {
+  background: #dfe9ff;
+  border-color: #758fc7;
+}
+
+/* FINISH */
+
+.space:nth-child(10) {
+  background: #d8f4dc;
+  border-color: #61a86a;
+
+  box-shadow:
+    0 0 15px rgba(70, 170, 80, 0.4);
 }
 
 #player {
   display: block;
-  font-size: 30px;
-  margin-top: 8px;
+
+  font-size: 34px;
+
+  margin-top: 7px;
+
+  filter: drop-shadow(
+    0 3px 3px rgba(0, 0, 0, 0.25)
+  );
+
+  animation: playerPulse 1.4s infinite;
+}
+
+@keyframes playerPulse {
+
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.18);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 #rollButton {
-  font-size: 20px;
-  padding: 14px 28px;
+  width: 80%;
+  max-width: 320px;
+
+  padding: 16px 20px;
+
+  font-size: 21px;
+  font-weight: bold;
+
   border: none;
-  border-radius: 12px;
+
+  border-radius: 18px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #8b5e3c,
+      #5c3923
+    );
+
+  box-shadow:
+    0 6px 0 #3e2819,
+    0 9px 15px rgba(0, 0, 0, 0.2);
+
   cursor: pointer;
-  background-color: #ffffff;
-  border: 2px solid #333;
+
+  transition: 0.15s;
+}
+
+#rollButton:hover {
+  transform: translateY(-2px);
+}
+
+#rollButton:active {
+  transform: translateY(4px);
+
+  box-shadow:
+    0 2px 0 #3e2819;
+}
+
+#rollButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 #diceResult {
-  font-size: 20px;
+  margin: 20px 0 0;
+
+  padding: 12px;
+
+  font-size: 21px;
   font-weight: bold;
-  margin-top: 15px;
+
+  color: #55351e;
+
+  background: #fff7e8;
+
+  border-radius: 14px;
+
+  border: 2px solid #e0c299;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 520px) {
+
   body {
     padding: 10px;
   }
 
+  .game-container {
+    padding: 18px 12px 28px;
+    border-radius: 20px;
+  }
+
   h1 {
-    font-size: 26px;
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 19px;
+  }
+
+  #board {
+    gap: 9px;
+    padding: 11px;
   }
 
   .space {
-    font-size: 15px;
-    min-height: 65px;
+    min-height: 90px;
+    font-size: 14px;
+    padding: 10px 6px;
+  }
+
+  #player {
+    font-size: 29px;
+  }
+
+  #rollButton {
+    width: 90%;
   }
 }
