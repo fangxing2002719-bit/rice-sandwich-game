@@ -5,6 +5,13 @@ const player = document.getElementById("player");
 const spaces = document.querySelectorAll(".space");
 
 const questionBox = document.getElementById("questionBox");
+const eventBox = document.getElementById("eventBox");
+const eventIcon = document.getElementById("eventIcon");
+const eventTitle = document.getElementById("eventTitle");
+const eventText = document.getElementById("eventText");
+const eventButton = document.getElementById("eventButton");
+
+let skipNextTurn = false;
 const questionText = document.getElementById("questionText");
 const answerButtons = document.querySelectorAll(".answerButton");
 const answerResult = document.getElementById("answerResult");
@@ -103,6 +110,15 @@ const questions = [
 /* ROLL DICE */
 
 rollButton.addEventListener("click", function () {
+    if (skipNextTurn) {
+
+    skipNextTurn = false;
+
+    diceResult.textContent =
+      "😢 Esperanza loses this turn.";
+
+    return;
+  }
 
   if (moving) return;
 
@@ -183,6 +199,7 @@ function movePlayer(steps) {
 
 function checkSpace() {
 
+  // FINISH
   if (playerPosition === spaces.length - 1) {
 
     diceResult.textContent =
@@ -195,12 +212,100 @@ function checkSpace() {
   }
 
 
+  // QUESTION
   if (
     spaces[playerPosition]
       .classList.contains("question-space")
   ) {
 
     showQuestion();
+
+    return;
+  }
+
+
+  // RICE SANDWICH
+  if (playerPosition === 2) {
+
+    showEvent(
+      "🥪",
+      "Rice Sandwich!",
+      "Your mother made your lunch. Move forward 1 space.",
+      1
+    );
+
+    return;
+  }
+
+
+  // MOTHER'S LETTER
+  if (playerPosition === 5) {
+
+    showEvent(
+      "✉️",
+      "Mother's Letter!",
+      "Your mother wrote a letter for you. Move forward 1 space.",
+      1
+    );
+
+    return;
+  }
+
+
+  // THE NUN
+  if (playerPosition === 7) {
+
+    showEvent(
+      "👩‍🦳",
+      "The Nun!",
+      "The nun stops Esperanza. Go back 1 space.",
+      -1
+    );
+
+    return;
+  }
+
+
+  // SISTER SUPERIOR
+  if (playerPosition === 9) {
+
+    showEvent(
+      "📚",
+      "Sister Superior!",
+      "You must answer another question.",
+      0,
+      true
+    );
+
+    return;
+  }
+
+
+  // CRYING
+  if (playerPosition === 11) {
+
+    showEvent(
+      "😢",
+      "Crying",
+      "Esperanza feels embarrassed. Lose your next turn.",
+      0,
+      false,
+      true
+    );
+
+    return;
+  }
+
+
+  // KLEENEX
+  if (playerPosition === 13) {
+
+    showEvent(
+      "🤧",
+      "Kleenex",
+      "Esperanza feels a little better. Safe space!",
+      0
+    );
 
     return;
   }
