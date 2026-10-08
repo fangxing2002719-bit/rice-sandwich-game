@@ -445,3 +445,12 @@ h2 {
   }
 
 }
+.current-space {
+  transform: scale(1.08);
+
+  box-shadow:
+    0 0 0 5px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 193, 7, 0.9);
+
+  z-index: 2;
+}
