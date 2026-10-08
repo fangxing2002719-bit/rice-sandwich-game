@@ -8,75 +8,183 @@
 </head>
 <body>
 
-  <div class="game-container">
+<div class="game-container">
+
+  <div class="game-header">
+    <div class="small-title">Sandra Cisneros</div>
 
     <h1>🥪 A Rice Sandwich</h1>
+
     <h2>Esperanza's Journey</h2>
 
-    <p>Help Esperanza reach the school canteen!</p>
+    <p class="mission">
+      Help Esperanza reach the school canteen!
+    </p>
+  </div>
 
-    <div id="board">
 
-      <div class="space">
-        🏠<br>
-        Start
-        <span id="player">🔵</span>
-      </div>
+  <div class="status-bar">
 
-      <div class="space">
-        ❓<br>
-        Question
-      </div>
+    <div>
+      👧
+      <span>Esperanza</span>
+    </div>
 
-      <div class="space">
-        🥪<br>
-        Rice Sandwich
-      </div>
+    <div>
+      🎯
+      <span>Goal: Canteen</span>
+    </div>
 
-      <div class="space">
-        ✉️<br>
-        Mother's Letter
-      </div>
+  </div>
 
-      <div class="space">
-        🏫<br>
-        School
-      </div>
 
-      <div class="space">
-        👩‍🦳<br>
-        The Nun
-      </div>
+  <div id="board">
 
-      <div class="space">
-        📚<br>
-        Sister Superior
-      </div>
+    <div class="space start-space">
+      <div class="space-icon">🏠</div>
+      <span>START</span>
 
-      <div class="space">
-        🏢<br>
-        The House
-      </div>
+      <span id="player">👧</span>
+    </div>
 
-      <div class="space">
-        😢<br>
-        Crying
-      </div>
 
-      <div class="space">
-        🍽️<br>
-        Canteen
-      </div>
+    <div class="space question-space">
+      <div class="space-icon">❓</div>
+      <span>Question</span>
+    </div>
+
+
+    <div class="space event-space">
+      <div class="space-icon">🥪</div>
+      <span>Rice Sandwich</span>
+    </div>
+
+
+    <div class="space">
+      <div class="space-icon">🚶‍♀️</div>
+      <span>Walk to School</span>
+    </div>
+
+
+    <div class="space question-space">
+      <div class="space-icon">❓</div>
+      <span>Question</span>
+    </div>
+
+
+    <div class="space event-space">
+      <div class="space-icon">✉️</div>
+      <span>Mother's Letter</span>
+    </div>
+
+
+    <div class="space school-space">
+      <div class="space-icon">🏫</div>
+      <span>School</span>
+    </div>
+
+
+    <div class="space danger-space">
+      <div class="space-icon">👩‍🦳</div>
+      <span>The Nun</span>
+    </div>
+
+
+    <div class="space question-space">
+      <div class="space-icon">❓</div>
+      <span>Question</span>
+    </div>
+
+
+    <div class="space danger-space">
+      <div class="space-icon">📚</div>
+      <span>Sister Superior</span>
+    </div>
+
+
+    <div class="space">
+      <div class="space-icon">🏢</div>
+      <span>The House</span>
+    </div>
+
+
+    <div class="space danger-space">
+      <div class="space-icon">😢</div>
+      <span>Crying</span>
+    </div>
+
+
+    <div class="space question-space">
+      <div class="space-icon">❓</div>
+      <span>Question</span>
+    </div>
+
+
+    <div class="space event-space">
+      <div class="space-icon">🤧</div>
+      <span>Kleenex</span>
+    </div>
+
+
+    <div class="space finish-space">
+      <div class="space-icon">🍽️</div>
+      <span>CANTEEN</span>
+      <small>FINISH!</small>
+    </div>
+
+  </div>
+
+
+  <div class="dice-panel">
+
+    <div class="dice-title">
+      YOUR TURN
+    </div>
+
+    <div id="diceResult">
+      🎲 Dice: -
+    </div>
+
+    <button id="rollButton">
+      🎲 ROLL DICE
+    </button>
+
+  </div>
+
+
+  <div id="questionBox" class="question-box">
+
+    <div class="question-card">
+
+      <h3>❓ Question</h3>
+
+      <p id="questionText">
+        Why does Esperanza want to eat in the canteen?
+      </p>
+
+      <button class="answerButton" data-correct="true">
+        A. She wants to feel like the special kids.
+      </button>
+
+      <button class="answerButton" data-correct="false">
+        B. She wants to skip class.
+      </button>
+
+      <button class="answerButton" data-correct="false">
+        C. She does not like her mother.
+      </button>
+
+      <p id="answerResult"></p>
 
     </div>
 
-    <button id="rollButton">🎲 Roll Dice</button>
-
-    <p id="diceResult">Dice: -</p>
-
   </div>
-<script src="script.js"></script>
-</body>
 
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
 </html>
 
