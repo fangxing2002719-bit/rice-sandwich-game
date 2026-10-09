@@ -10,7 +10,8 @@ const eventIcon = document.getElementById("eventIcon");
 const eventTitle = document.getElementById("eventTitle");
 const eventText = document.getElementById("eventText");
 const eventButton = document.getElementById("eventButton");
-
+const victoryBox = document.getElementById("victoryBox");
+const restartButton = document.getElementById("restartButton");
 let skipNextTurn = false;
 const questionText = document.getElementById("questionText");
 const answerButtons = document.querySelectorAll(".answerButton");
@@ -198,19 +199,21 @@ function movePlayer(steps) {
 /* CHECK SPACE */
 
 function checkSpace() {
+if (playerPosition === spaces.length - 1) {
 
-  // FINISH
-  if (playerPosition === spaces.length - 1) {
+  diceResult.textContent =
+    "🎉 Esperanza reached the canteen!";
 
-    diceResult.textContent =
-      "🎉 Esperanza reached the canteen! You win!";
+  rollButton.disabled = true;
+  moving = false;
 
-    rollButton.disabled = true;
-    moving = false;
+  setTimeout(function () {
+    victoryBox.style.display = "flex";
+  }, 500);
 
-    return;
-  }
-
+  return;
+}
+  
 
   // QUESTION
   if (
