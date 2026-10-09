@@ -432,3 +432,56 @@ restartButton.addEventListener("click", function () {
 
   rollButton.disabled = false;
 });
+function showEvent(
+  icon,
+  title,
+  text,
+  movement = 0,
+  extraQuestion = false,
+  loseTurn = false
+) {
+
+  eventIcon.textContent = icon;
+  eventTitle.textContent = title;
+  eventText.textContent = text;
+
+  eventBox.style.display = "flex";
+
+  eventButton.onclick = function () {
+
+    eventBox.style.display = "none";
+
+    if (movement !== 0) {
+
+      spaces[playerPosition]
+        .classList.remove("current-space");
+
+      playerPosition =
+        Math.max(
+          0,
+          Math.min(
+            spaces.length - 1,
+            playerPosition + movement
+          )
+        );
+
+      spaces[playerPosition]
+        .appendChild(player);
+
+      spaces[playerPosition]
+        .classList.add("current-space");
+    }
+
+    if (loseTurn) {
+      skipNextTurn = true;
+    }
+
+    if (extraQuestion) {
+      showQuestion();
+      return;
+    }
+
+    moving = false;
+    rollButton.disabled = false;
+  };
+}
