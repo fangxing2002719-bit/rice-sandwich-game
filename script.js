@@ -12,8 +12,7 @@ const eventIcon = document.getElementById("eventIcon");
 const eventTitle = document.getElementById("eventTitle");
 const eventText = document.getElementById("eventText");
 const eventButton = document.getElementById("eventButton");
-const victoryBox = document.getElementById("victoryBox");
-const restartButton = document.getElementById("restartButton");
+
 let skipNextTurn = false;
 const questionText = document.getElementById("questionText");
 const answerButtons = document.querySelectorAll(".answerButton");
