@@ -413,3 +413,23 @@ answerButtons.forEach(function (button) {
   });
 
 });
+restartButton.addEventListener("click", function () {
+
+  victoryBox.style.display = "none";
+
+  spaces[playerPosition]
+    .classList.remove("current-space");
+
+  playerPosition = 0;
+
+  spaces[0].appendChild(player);
+
+  spaces[0].classList.add("current-space");
+
+  skipNextTurn = false;
+  moving = false;
+
+  diceResult.textContent = "🎲 Dice: -";
+
+  rollButton.disabled = false;
+});
