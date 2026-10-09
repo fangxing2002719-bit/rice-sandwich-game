@@ -1,25 +1,25 @@
-
 const rollButton = document.getElementById("rollButton");
 const diceResult = document.getElementById("diceResult");
 const player = document.getElementById("player");
 const spaces = document.querySelectorAll(".space");
 
 const questionBox = document.getElementById("questionBox");
+const questionText = document.getElementById("questionText");
+const answerButtons = document.querySelectorAll(".answerButton");
+const answerResult = document.getElementById("answerResult");
+
 const eventBox = document.getElementById("eventBox");
-const victoryBox = document.getElementById("victoryBox");
-const restartButton = document.getElementById("restartButton");
 const eventIcon = document.getElementById("eventIcon");
 const eventTitle = document.getElementById("eventTitle");
 const eventText = document.getElementById("eventText");
 const eventButton = document.getElementById("eventButton");
 
-let skipNextTurn = false;
-const questionText = document.getElementById("questionText");
-const answerButtons = document.querySelectorAll(".answerButton");
-const answerResult = document.getElementById("answerResult");
+const victoryBox = document.getElementById("victoryBox");
+const restartButton = document.getElementById("restartButton");
 
 let playerPosition = 0;
 let moving = false;
+let skipNextTurn = false;
 
 const diceFaces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 
@@ -112,17 +112,20 @@ const questions = [
 /* ROLL DICE */
 
 rollButton.addEventListener("click", function () {
-    if (skipNextTurn) {
+
+  if (moving) {
+    return;
+  }
+
+  if (skipNextTurn) {
 
     skipNextTurn = false;
 
     diceResult.textContent =
-      "😢 Esperanza loses this turn.";
+      "😢 Esperanza loses this turn. Roll again for the next turn.";
 
     return;
   }
-
-  if (moving) return;
 
   moving = true;
   rollButton.disabled = true;
@@ -149,14 +152,13 @@ rollButton.addEventListener("click", function () {
       diceResult.textContent =
         "🎲 You rolled: " +
         diceFaces[dice - 1] +
-        "  " +
+        " " +
         dice;
 
       movePlayer(dice);
     }
 
   }, 100);
-
 });
 
 
@@ -193,28 +195,29 @@ function movePlayer(steps) {
     }
 
   }, 350);
-
 }
 
 
 /* CHECK SPACE */
 
 function checkSpace() {
-if (playerPosition === spaces.length - 1) {
 
-  diceResult.textContent =
-    "🎉 Esperanza reached the canteen!";
+  // FINISH
+  if (playerPosition === spaces.length - 1) {
 
-  rollButton.disabled = true;
-  moving = false;
+    diceResult.textContent =
+      "🎉 Esperanza reached the canteen!";
 
-  setTimeout(function () {
-    victoryBox.style.display = "flex";
-  }, 500);
+    moving = false;
+    rollButton.disabled = true;
 
-  return;
-}
-  
+    setTimeout(function () {
+      victoryBox.style.display = "flex";
+    }, 500);
+
+    return;
+  }
+
 
   // QUESTION
   if (
@@ -315,12 +318,14 @@ if (playerPosition === spaces.length - 1) {
   }
 
 
+  // NORMAL SPACE:
+  // Walk to School, School, The House
   moving = false;
   rollButton.disabled = false;
 }
 
 
-/* SHOW RANDOM QUESTION */
+/* RANDOM QUESTION */
 
 function showQuestion() {
 
@@ -341,20 +346,20 @@ function showQuestion() {
       ". " +
       randomQuestion.answers[index];
 
-    button.dataset.correct =
-      index === randomQuestion.correct
-        ? "true"
-        : "false";
+    if (index === randomQuestion.correct) {
+      button.dataset.correct = "true";
+    } else {
+      button.dataset.correct = "false";
+    }
 
     button.disabled = false;
   });
-
 
   questionBox.style.display = "flex";
 }
 
 
-/* ANSWERS */
+/* QUESTION ANSWERS */
 
 answerButtons.forEach(function (button) {
 
@@ -363,7 +368,6 @@ answerButtons.forEach(function (button) {
     answerButtons.forEach(function (btn) {
       btn.disabled = true;
     });
-
 
     if (button.dataset.correct === "true") {
 
@@ -377,11 +381,9 @@ answerButtons.forEach(function (button) {
         moving = false;
         rollButton.disabled = false;
 
-      }, 1200);
+      }, 1000);
 
-    }
-
-    else {
+    } else {
 
       answerResult.textContent =
         "❌ Wrong! Go back 1 space.";
@@ -405,33 +407,15 @@ answerButtons.forEach(function (button) {
         moving = false;
         rollButton.disabled = false;
 
-      }, 1400);
-
+      }, 1200);
     }
 
   });
-
 });
-restartButton.addEventListener("click", function () {
 
-  victoryBox.style.display = "none";
 
-  spaces[playerPosition]
-    .classList.remove("current-space");
+/* SPECIAL EVENTS */
 
-  playerPosition = 0;
-
-  spaces[0].appendChild(player);
-
-  spaces[0].classList.add("current-space");
-
-  skipNextTurn = false;
-  moving = false;
-
-  diceResult.textContent = "🎲 Dice: -";
-
-  rollButton.disabled = false;
-});
 function showEvent(
   icon,
   title,
@@ -477,7 +461,9 @@ function showEvent(
     }
 
     if (extraQuestion) {
+
       showQuestion();
+
       return;
     }
 
@@ -485,3 +471,29 @@ function showEvent(
     rollButton.disabled = false;
   };
 }
+
+
+/* PLAY AGAIN */
+
+restartButton.addEventListener("click", function () {
+
+  victoryBox.style.display = "none";
+  questionBox.style.display = "none";
+  eventBox.style.display = "none";
+
+  spaces.forEach(function (space) {
+    space.classList.remove("current-space");
+  });
+
+  playerPosition = 0;
+
+  spaces[0].appendChild(player);
+  spaces[0].classList.add("current-space");
+
+  skipNextTurn = false;
+  moving = false;
+
+  diceResult.textContent = "🎲 Dice: -";
+
+  rollButton.disabled = false;
+});
