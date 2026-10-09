@@ -6,6 +6,8 @@ const spaces = document.querySelectorAll(".space");
 
 const questionBox = document.getElementById("questionBox");
 const eventBox = document.getElementById("eventBox");
+const victoryBox = document.getElementById("victoryBox");
+const restartButton = document.getElementById("restartButton");
 const eventIcon = document.getElementById("eventIcon");
 const eventTitle = document.getElementById("eventTitle");
 const eventText = document.getElementById("eventText");
