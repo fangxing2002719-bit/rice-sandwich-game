@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,225 +11,707 @@
 
   <title>A Rice Sandwich Game</title>
 
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=100">
 </head>
 
 
 <body>
 
-<div class="game-container">
+<!-- =========================
+     START SCREEN
+========================= -->
 
-  <div class="game-header">
+<div id="startScreen" class="start-screen">
 
-    <div class="small-title">
-      Sandra Cisneros
+  <div class="book-label">
+    SANDRA CISNEROS
+  </div>
+
+  <div class="start-logo">
+    🥪
+  </div>
+
+  <h1 class="start-title">
+    A Rice Sandwich
+  </h1>
+
+  <h2 class="start-subtitle">
+    Esperanza's Journey
+  </h2>
+
+  <p class="start-description">
+    Help Esperanza reach the school canteen.
+  </p>
+
+
+  <div class="setup-card">
+
+    <label for="playerCount">
+      Number of Players
+    </label>
+
+    <select id="playerCount">
+      <option value="2">2 Players</option>
+      <option value="3">3 Players</option>
+      <option value="4">4 Players</option>
+    </select>
+
+
+    <div class="name-fields">
+
+      <div class="name-row" data-player="0">
+        <span class="setup-token">🔵</span>
+
+        <input
+          id="playerName0"
+          type="text"
+          maxlength="12"
+          placeholder="Player 1"
+        >
+      </div>
+
+
+      <div class="name-row" data-player="1">
+        <span class="setup-token">🔴</span>
+
+        <input
+          id="playerName1"
+          type="text"
+          maxlength="12"
+          placeholder="Player 2"
+        >
+      </div>
+
+
+      <div class="name-row" data-player="2">
+        <span class="setup-token">🟢</span>
+
+        <input
+          id="playerName2"
+          type="text"
+          maxlength="12"
+          placeholder="Player 3"
+        >
+      </div>
+
+
+      <div class="name-row" data-player="3">
+        <span class="setup-token">🟣</span>
+
+        <input
+          id="playerName3"
+          type="text"
+          maxlength="12"
+          placeholder="Player 4"
+        >
+      </div>
+
     </div>
 
-    <h1>🥪 A Rice Sandwich</h1>
 
-    <h2>Esperanza's Journey</h2>
+    <button id="startButton">
+      ▶ START GAME
+    </button>
 
-    <p class="mission">
-      Help Esperanza reach the school canteen!
+  </div>
+
+</div>
+
+
+
+<!-- =========================
+     GAME SCREEN
+========================= -->
+
+<div id="gameScreen" class="game-screen screen-hidden">
+
+  <header class="game-header">
+
+    <div class="header-book">
+      A RICE SANDWICH
+    </div>
+
+    <h1>
+      Esperanza's Journey
+    </h1>
+
+    <p>
+      🏠 Home → 🍽️ School Canteen
     </p>
 
-  </div>
+  </header>
 
 
-  <div class="status-bar">
+  <!-- CURRENT TURN -->
 
-    <div>
-      👧 Esperanza
-    </div>
+  <section class="turn-panel">
 
     <div>
-      🎯 Goal: Canteen
+
+      <div class="turn-small">
+        CURRENT TURN
+      </div>
+
+      <div id="turnName">
+        Player 1
+      </div>
+
     </div>
 
-  </div>
+
+    <div class="progress-box">
+
+      <div class="turn-small">
+        PROGRESS
+      </div>
+
+      <div id="progressText">
+        0 / 19
+      </div>
+
+    </div>
+
+  </section>
 
 
-  <div id="board">
 
-    <div class="space start-space">
-      <div class="space-icon">🏠</div>
+  <!-- PLAYER SCORES -->
+
+  <div
+    id="scoreBoard"
+    class="score-board"
+  ></div>
+
+
+
+  <!-- =========================
+       GAME BOARD
+  ========================= -->
+
+  <main id="board">
+
+
+    <!-- 0 -->
+
+    <div
+      class="space start-space"
+      data-type="normal"
+    >
+
+      <div class="space-icon">
+        🏠
+      </div>
+
       <span>START</span>
 
-      <span id="player">👧</span>
+      <small>Home</small>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space question-space">
-      <div class="space-icon">❓</div>
+    <!-- 1 -->
+
+    <div
+      class="space question-space"
+      data-type="question"
+    >
+
+      <div class="space-icon">
+        ❓
+      </div>
+
       <span>Question</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space event-space">
-      <div class="space-icon">🥪</div>
+    <!-- 2 -->
+
+    <div
+      class="space event-space"
+      data-type="event"
+      data-event="rice"
+    >
+
+      <div class="space-icon">
+        🥪
+      </div>
+
       <span>Rice Sandwich</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space">
-      <div class="space-icon">🚶‍♀️</div>
-      <span>Walk to School</span>
-    </div>
+    <!-- 3 -->
 
+    <div
+      class="space event-space"
+      data-type="event"
+      data-event="letter"
+    >
 
-    <div class="space question-space">
-      <div class="space-icon">❓</div>
-      <span>Question</span>
-    </div>
+      <div class="space-icon">
+        ✉️
+      </div>
 
-
-    <div class="space event-space">
-      <div class="space-icon">✉️</div>
       <span>Mother's Letter</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space school-space">
-      <div class="space-icon">🏫</div>
+    <!-- 4 -->
+
+    <div
+      class="space normal-space"
+      data-type="normal"
+    >
+
+      <div class="space-icon">
+        🚶‍♀️
+      </div>
+
+      <span>Walk to School</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 5 -->
+
+    <div
+      class="space school-space"
+      data-type="normal"
+    >
+
+      <div class="space-icon">
+        🏫
+      </div>
+
       <span>School</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space danger-space">
-      <div class="space-icon">👩‍🦳</div>
+    <!-- 6 -->
+
+    <div
+      class="space normal-space"
+      data-type="normal"
+    >
+
+      <div class="space-icon">
+        🍱
+      </div>
+
+      <span>Lunch Line</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 7 -->
+
+    <div
+      class="space danger-space"
+      data-type="event"
+      data-event="nun"
+    >
+
+      <div class="space-icon">
+        👩‍🦳
+      </div>
+
       <span>The Nun</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space question-space">
-      <div class="space-icon">❓</div>
+    <!-- 8 -->
+
+    <div
+      class="space question-space"
+      data-type="question"
+    >
+
+      <div class="space-icon">
+        ❓
+      </div>
+
       <span>Question</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space danger-space">
-      <div class="space-icon">📚</div>
+    <!-- 9 -->
+
+    <div
+      class="space normal-space"
+      data-type="normal"
+    >
+
+      <div class="space-icon">
+        ⬆️
+      </div>
+
+      <span>Go Upstairs</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 10 -->
+
+    <div
+      class="space danger-space"
+      data-type="event"
+      data-event="sister"
+    >
+
+      <div class="space-icon">
+        📚
+      </div>
+
       <span>Sister Superior</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space">
-      <div class="space-icon">🏢</div>
-      <span>The House</span>
-    </div>
+    <!-- 11 -->
 
+    <div
+      class="space question-space"
+      data-type="question"
+    >
 
-    <div class="space danger-space">
-      <div class="space-icon">😢</div>
-      <span>Crying</span>
-    </div>
+      <div class="space-icon">
+        ❓
+      </div>
 
-
-    <div class="space question-space">
-      <div class="space-icon">❓</div>
       <span>Question</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space event-space">
-      <div class="space-icon">🤧</div>
+    <!-- 12 -->
+
+    <div
+      class="space normal-space"
+      data-type="normal"
+    >
+
+      <div class="space-icon">
+        🪟
+      </div>
+
+      <span>The Window</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 13 -->
+
+    <div
+      class="space normal-space"
+      data-type="normal"
+    >
+
+      <div class="space-icon">
+        🏢
+      </div>
+
+      <span>The House</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 14 -->
+
+    <div
+      class="space danger-space"
+      data-type="event"
+      data-event="cry"
+    >
+
+      <div class="space-icon">
+        😢
+      </div>
+
+      <span>Crying</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 15 -->
+
+    <div
+      class="space event-space"
+      data-type="event"
+      data-event="kleenex"
+    >
+
+      <div class="space-icon">
+        🤧
+      </div>
+
       <span>Kleenex</span>
+
+      <div class="token-zone"></div>
+
     </div>
 
 
-    <div class="space finish-space">
-      <div class="space-icon">🍽️</div>
+    <!-- 16 -->
+
+    <div
+      class="space bonus-space"
+      data-type="event"
+      data-event="permission"
+    >
+
+      <div class="space-icon">
+        ⭐
+      </div>
+
+      <span>Permission</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 17 -->
+
+    <div
+      class="space question-space"
+      data-type="question"
+    >
+
+      <div class="space-icon">
+        ❓
+      </div>
+
+      <span>Question</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 18 -->
+
+    <div
+      class="space normal-space"
+      data-type="normal"
+    >
+
+      <div class="space-icon">
+        🚪
+      </div>
+
+      <span>Canteen Door</span>
+
+      <div class="token-zone"></div>
+
+    </div>
+
+
+    <!-- 19 -->
+
+    <div
+      class="space finish-space"
+      data-type="finish"
+    >
+
+      <div class="space-icon">
+        🍽️
+      </div>
+
       <span>CANTEEN</span>
+
       <small>FINISH!</small>
+
+      <div class="token-zone"></div>
+
     </div>
 
-  </div>
+
+  </main>
 
 
-  <div class="dice-panel">
 
-    <div class="dice-title">
-      YOUR TURN
+  <!-- =========================
+       DICE PANEL
+  ========================= -->
+
+  <section class="dice-panel">
+
+    <div id="diceVisual">
+      ⚀
     </div>
 
-    <div id="diceResult">
-      🎲 Dice: -
+    <div
+      id="diceResult"
+      aria-live="polite"
+    >
+      Ready!
     </div>
 
     <button id="rollButton">
       🎲 ROLL DICE
     </button>
 
-  </div>
+  </section>
 
 
-  <div id="questionBox" class="question-box">
+</div>
 
-    <div class="question-card">
 
-      <h3>❓ Question</h3>
 
-      <p id="questionText">
-        Why does Esperanza want to eat in the canteen?
-      </p>
+<!-- =========================
+     QUESTION MODAL
+========================= -->
 
-      <button
-        class="answerButton"
-        data-correct="true"
-      >
-        A. She wants to feel like the special kids.
-      </button>
+<div
+  id="questionModal"
+  class="modal"
+>
 
-      <button
-        class="answerButton"
-        data-correct="false"
-      >
-        B. She wants to skip class.
-      </button>
+  <div class="modal-card question-card">
 
-      <button
-        class="answerButton"
-        data-correct="false"
-      >
-        C. She does not like her mother.
-      </button>
-
-      <p id="answerResult"></p>
-
+    <div class="modal-icon">
+      ❓
     </div>
 
+    <div class="modal-label">
+      QUESTION
+    </div>
+
+    <h2 id="questionText">
+      Question
+    </h2>
+
+    <div id="answerOptions"></div>
+
+    <div
+      id="questionFeedback"
+      class="feedback"
+      aria-live="polite"
+    ></div>
+
   </div>
-<div id="eventBox" class="event-box">
 
-  <div class="event-card">
+</div>
 
-    <div id="eventIcon">🥪</div>
 
-    <h3 id="eventTitle">Event!</h3>
+
+<!-- =========================
+     EVENT MODAL
+========================= -->
+
+<div
+  id="eventModal"
+  class="modal"
+>
+
+  <div class="modal-card event-card">
+
+    <div
+      id="eventIcon"
+      class="event-big-icon"
+    >
+      ⭐
+    </div>
+
+    <div class="modal-label">
+      SPECIAL EVENT
+    </div>
+
+    <h2 id="eventTitle">
+      Special Event
+    </h2>
 
     <p id="eventText"></p>
 
-    <button id="eventButton">
-      Continue
+    <button id="eventContinue">
+      CONTINUE
     </button>
 
   </div>
 
 </div>
-  <div id="victoryBox" class="victory-box">
 
-  <div class="victory-card">
 
-    <div class="victory-icon">🎉</div>
 
-    <h2>YOU WIN!</h2>
+<!-- =========================
+     VICTORY MODAL
+========================= -->
+
+<div
+  id="victoryModal"
+  class="modal"
+>
+
+  <div class="modal-card victory-card">
+
+    <div class="victory-icon">
+      🏆
+    </div>
+
+    <div class="victory-small">
+      JOURNEY COMPLETE
+    </div>
+
+    <h1>
+      YOU WIN!
+    </h1>
+
+    <h2 id="winnerName">
+      Player 1
+    </h2>
 
     <p>
-      Esperanza reached the canteen!
+      reached the school canteen!
     </p>
 
-    <p class="ending-text">
-      "The canteen was nothing special."
+    <div class="winner-stars">
+
+      ⭐ Stars:
+
+      <strong id="winnerStars">
+        0
+      </strong>
+
+    </div>
+
+    <p class="story-ending">
+      “The canteen was nothing special.”
     </p>
 
     <button id="restartButton">
@@ -241,10 +721,16 @@
   </div>
 
 </div>
-</div>
 
 
-<script src="script.js?v=20"></script>
+
+<div
+  id="confettiLayer"
+  class="confetti-layer"
+></div>
+
+
+<script src="script.js?v=100"></script>
 
 </body>
 
