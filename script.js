@@ -1,499 +1,1328 @@
-const rollButton = document.getElementById("rollButton");
-const diceResult = document.getElementById("diceResult");
-const player = document.getElementById("player");
-const spaces = document.querySelectorAll(".space");
-
-const questionBox = document.getElementById("questionBox");
-const questionText = document.getElementById("questionText");
-const answerButtons = document.querySelectorAll(".answerButton");
-const answerResult = document.getElementById("answerResult");
-
-const eventBox = document.getElementById("eventBox");
-const eventIcon = document.getElementById("eventIcon");
-const eventTitle = document.getElementById("eventTitle");
-const eventText = document.getElementById("eventText");
-const eventButton = document.getElementById("eventButton");
-
-const victoryBox = document.getElementById("victoryBox");
-const restartButton = document.getElementById("restartButton");
-
-let playerPosition = 0;
-let moving = false;
-let skipNextTurn = false;
-
-const diceFaces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
-
-
-/* QUESTIONS */
-
-const questions = [
-  {
-    question: "Why does Esperanza want to eat in the canteen?",
-    answers: [
-      "She wants to feel like the special kids.",
-      "She wants to skip class.",
-      "She does not like her mother."
-    ],
-    correct: 0
-  },
-
-  {
-    question: "What does Esperanza's mother make for her lunch?",
-    answers: [
-      "A chicken sandwich.",
-      "A rice sandwich.",
-      "A hamburger."
-    ],
-    correct: 1
-  },
-
-  {
-    question: "Who writes a letter for Esperanza?",
-    answers: [
-      "Her mother.",
-      "Her teacher.",
-      "Nenny."
-    ],
-    correct: 0
-  },
-
-  {
-    question: "Who stops Esperanza before she can eat in the canteen?",
-    answers: [
-      "Her mother.",
-      "A nun.",
-      "Carlos."
-    ],
-    correct: 1
-  },
-
-  {
-    question: "Who must approve Esperanza's letter?",
-    answers: [
-      "Sister Superior.",
-      "Nenny.",
-      "Gloria."
-    ],
-    correct: 0
-  },
-
-  {
-    question: "How far does Sister Superior say Esperanza lives from school?",
-    answers: [
-      "About three blocks.",
-      "Ten miles.",
-      "One hour away."
-    ],
-    correct: 0
-  },
-
-  {
-    question: "Why does Esperanza begin to cry?",
-    answers: [
-      "She loses her lunch.",
-      "She feels embarrassed and uncomfortable.",
-      "She wants to go shopping."
-    ],
-    correct: 1
-  },
-
-  {
-    question: "How does Esperanza feel about the canteen at the end?",
-    answers: [
-      "It is amazing.",
-      "It is nothing special.",
-      "It is better than home."
-    ],
-    correct: 1
-  }
-];
-
-
-/* ROLL DICE */
-
-rollButton.addEventListener("click", function () {
-
-  if (moving) {
-    return;
-  }
-
-  if (skipNextTurn) {
-
-    skipNextTurn = false;
-
-    diceResult.textContent =
-      "😢 Esperanza loses this turn. Roll again for the next turn.";
-
-    return;
-  }
-
-  moving = true;
-  rollButton.disabled = true;
-
-  let animationCount = 0;
-
-  const diceAnimation = setInterval(function () {
-
-    const randomFace =
-      diceFaces[Math.floor(Math.random() * diceFaces.length)];
-
-    diceResult.textContent =
-      "🎲 Rolling... " + randomFace;
-
-    animationCount++;
-
-    if (animationCount >= 8) {
-
-      clearInterval(diceAnimation);
-
-      const dice =
-        Math.floor(Math.random() * 6) + 1;
-
-      diceResult.textContent =
-        "🎲 You rolled: " +
-        diceFaces[dice - 1] +
-        " " +
-        dice;
-
-      movePlayer(dice);
-    }
-
-  }, 100);
-});
-
-
-/* MOVE PLAYER */
-
-function movePlayer(steps) {
-
-  const targetPosition =
-    Math.min(
-      playerPosition + steps,
-      spaces.length - 1
-    );
-
-  const moveTimer = setInterval(function () {
-
-    if (playerPosition < targetPosition) {
-
-      spaces[playerPosition]
-        .classList.remove("current-space");
-
-      playerPosition++;
-
-      spaces[playerPosition]
-        .appendChild(player);
-
-      spaces[playerPosition]
-        .classList.add("current-space");
-
-    } else {
-
-      clearInterval(moveTimer);
-
-      checkSpace();
-    }
-
-  }, 350);
+* {
+  box-sizing: border-box;
 }
 
 
-/* CHECK SPACE */
+:root {
+  --brown-dark: #3f291b;
+  --brown: #795035;
+  --brown-light: #c99b69;
 
-function checkSpace() {
+  --cream: #fff9ec;
+  --paper: #fffdf8;
 
-  // FINISH
-  if (playerPosition === spaces.length - 1) {
+  --blue: #6e9fda;
+  --green: #67a96c;
+  --red: #c96c68;
+  --gold: #ddb54d;
+  --purple: #937ac0;
 
-    diceResult.textContent =
-      "🎉 Esperanza reached the canteen!";
-
-    moving = false;
-    rollButton.disabled = true;
-
-    setTimeout(function () {
-      victoryBox.style.display = "flex";
-    }, 500);
-
-    return;
-  }
-
-
-  // QUESTION
-  if (
-    spaces[playerPosition]
-      .classList.contains("question-space")
-  ) {
-
-    showQuestion();
-
-    return;
-  }
-
-
-  // RICE SANDWICH
-  if (playerPosition === 2) {
-
-    showEvent(
-      "🥪",
-      "Rice Sandwich!",
-      "Your mother made your lunch. Move forward 1 space.",
-      1
-    );
-
-    return;
-  }
-
-
-  // MOTHER'S LETTER
-  if (playerPosition === 5) {
-
-    showEvent(
-      "✉️",
-      "Mother's Letter!",
-      "Your mother wrote a letter for you. Move forward 1 space.",
-      1
-    );
-
-    return;
-  }
-
-
-  // THE NUN
-  if (playerPosition === 7) {
-
-    showEvent(
-      "👩‍🦳",
-      "The Nun!",
-      "The nun stops Esperanza. Go back 1 space.",
-      -1
-    );
-
-    return;
-  }
-
-
-  // SISTER SUPERIOR
-  if (playerPosition === 9) {
-
-    showEvent(
-      "📚",
-      "Sister Superior!",
-      "You must answer another question.",
-      0,
-      true
-    );
-
-    return;
-  }
-
-
-  // CRYING
-  if (playerPosition === 11) {
-
-    showEvent(
-      "😢",
-      "Crying",
-      "Esperanza feels embarrassed. Lose your next turn.",
-      0,
-      false,
-      true
-    );
-
-    return;
-  }
-
-
-  // KLEENEX
-  if (playerPosition === 13) {
-
-    showEvent(
-      "🤧",
-      "Kleenex",
-      "Esperanza feels a little better. Safe space!",
-      0
-    );
-
-    return;
-  }
-
-
-  // NORMAL SPACE:
-  // Walk to School, School, The House
-  moving = false;
-  rollButton.disabled = false;
+  --text: #3f332b;
 }
 
 
-/* RANDOM QUESTION */
+body {
+  margin: 0;
 
-function showQuestion() {
+  min-height: 100vh;
 
-  const randomQuestion =
-    questions[
-      Math.floor(Math.random() * questions.length)
-    ];
+  padding: 18px;
 
-  questionText.textContent =
-    randomQuestion.question;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
 
-  answerResult.textContent = "";
+  color: var(--text);
 
-  answerButtons.forEach(function (button, index) {
-
-    button.textContent =
-      String.fromCharCode(65 + index) +
-      ". " +
-      randomQuestion.answers[index];
-
-    if (index === randomQuestion.correct) {
-      button.dataset.correct = "true";
-    } else {
-      button.dataset.correct = "false";
-    }
-
-    button.disabled = false;
-  });
-
-  questionBox.style.display = "flex";
+  background:
+    radial-gradient(
+      circle at 15% 15%,
+      rgba(255,255,255,.7),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #f7dfb4,
+      #deb37d
+    );
 }
 
 
-/* QUESTION ANSWERS */
-
-answerButtons.forEach(function (button) {
-
-  button.addEventListener("click", function () {
-
-    answerButtons.forEach(function (btn) {
-      btn.disabled = true;
-    });
-
-    if (button.dataset.correct === "true") {
-
-      answerResult.textContent =
-        "✅ Correct! Great job!";
-
-      setTimeout(function () {
-
-        questionBox.style.display = "none";
-
-        moving = false;
-        rollButton.disabled = false;
-
-      }, 1000);
-
-    } else {
-
-      answerResult.textContent =
-        "❌ Wrong! Go back 1 space.";
-
-      setTimeout(function () {
-
-        spaces[playerPosition]
-          .classList.remove("current-space");
-
-        playerPosition =
-          Math.max(0, playerPosition - 1);
-
-        spaces[playerPosition]
-          .appendChild(player);
-
-        spaces[playerPosition]
-          .classList.add("current-space");
-
-        questionBox.style.display = "none";
-
-        moving = false;
-        rollButton.disabled = false;
-
-      }, 1200);
-    }
-
-  });
-});
-
-
-/* SPECIAL EVENTS */
-
-function showEvent(
-  icon,
-  title,
-  text,
-  movement = 0,
-  extraQuestion = false,
-  loseTurn = false
-) {
-
-  eventIcon.textContent = icon;
-  eventTitle.textContent = title;
-  eventText.textContent = text;
-
-  eventBox.style.display = "flex";
-
-  eventButton.onclick = function () {
-
-    eventBox.style.display = "none";
-
-    if (movement !== 0) {
-
-      spaces[playerPosition]
-        .classList.remove("current-space");
-
-      playerPosition =
-        Math.max(
-          0,
-          Math.min(
-            spaces.length - 1,
-            playerPosition + movement
-          )
-        );
-
-      spaces[playerPosition]
-        .appendChild(player);
-
-      spaces[playerPosition]
-        .classList.add("current-space");
-    }
-
-    if (loseTurn) {
-      skipNextTurn = true;
-    }
-
-    if (extraQuestion) {
-
-      showQuestion();
-
-      return;
-    }
-
-    moving = false;
-    rollButton.disabled = false;
-  };
+button,
+input,
+select {
+  font: inherit;
 }
 
 
-/* PLAY AGAIN */
+button {
+  cursor: pointer;
+}
 
-restartButton.addEventListener("click", function () {
 
-  victoryBox.style.display = "none";
-  questionBox.style.display = "none";
-  eventBox.style.display = "none";
+.screen-hidden {
+  display: none !important;
+}
 
-  spaces.forEach(function (space) {
-    space.classList.remove("current-space");
-  });
 
-  playerPosition = 0;
 
-  spaces[0].appendChild(player);
-  spaces[0].classList.add("current-space");
+/* =========================
+   START SCREEN
+========================= */
 
-  skipNextTurn = false;
-  moving = false;
+.start-screen {
+  width: 100%;
 
-  diceResult.textContent = "🎲 Dice: -";
+  max-width: 520px;
 
-  rollButton.disabled = false;
-});
+  margin: 35px auto;
+
+  padding: 38px 25px;
+
+  text-align: center;
+
+  border: 5px solid var(--brown-dark);
+
+  border-radius: 32px;
+
+  background:
+    linear-gradient(
+      150deg,
+      #fffdf7,
+      #fff3d8
+    );
+
+  box-shadow:
+    0 20px 45px rgba(72,45,27,.28);
+}
+
+
+.book-label {
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 3px;
+
+  color: #96775f;
+}
+
+
+.start-logo {
+  margin: 12px 0 4px;
+
+  font-size: 84px;
+
+  animation: floatLogo 2s ease-in-out infinite;
+}
+
+
+.start-title {
+  margin: 0;
+
+  color: var(--brown-dark);
+
+  font-size: 42px;
+}
+
+
+.start-subtitle {
+  margin: 5px 0 0;
+
+  color: #96603b;
+
+  font-size: 22px;
+}
+
+
+.start-description {
+  margin: 20px auto;
+
+  max-width: 340px;
+
+  color: #746257;
+
+  line-height: 1.5;
+}
+
+
+.setup-card {
+  margin-top: 22px;
+
+  padding: 20px;
+
+  border: 2px solid #dfc6a2;
+
+  border-radius: 22px;
+
+  background: rgba(255,255,255,.72);
+}
+
+
+.setup-card label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  text-align: left;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  color: #73553f;
+}
+
+
+#playerCount {
+  width: 100%;
+
+  min-height: 48px;
+
+  padding: 0 12px;
+
+  border: 2px solid #d5b38d;
+
+  border-radius: 12px;
+
+  background: white;
+
+  font-size: 16px;
+}
+
+
+.name-fields {
+  margin-top: 15px;
+}
+
+
+.name-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin: 10px 0;
+}
+
+
+.setup-token {
+  width: 36px;
+
+  font-size: 25px;
+}
+
+
+.name-row input {
+  width: 100%;
+
+  min-width: 0;
+
+  min-height: 46px;
+
+  padding: 0 13px;
+
+  border: 2px solid #dfd2c3;
+
+  border-radius: 12px;
+
+  background: white;
+
+  font-size: 16px;
+}
+
+
+#startButton {
+  width: 100%;
+
+  min-height: 58px;
+
+  margin-top: 16px;
+
+  border: none;
+
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      #94603b,
+      #5d3923
+    );
+
+  color: white;
+
+  font-size: 19px;
+
+  font-weight: 900;
+
+  box-shadow:
+    0 6px 0 #3d2517;
+
+  transition: .12s;
+}
+
+
+#startButton:active {
+  transform: translateY(5px);
+
+  box-shadow:
+    0 1px 0 #3d2517;
+}
+
+
+@keyframes floatLogo {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+}
+
+
+
+/* =========================
+   GAME
+========================= */
+
+.game-screen {
+  width: 100%;
+
+  max-width: 760px;
+
+  margin: auto;
+}
+
+
+.game-header {
+  margin-bottom: 15px;
+
+  text-align: center;
+}
+
+
+.header-book {
+  font-size: 11px;
+
+  font-weight: 900;
+
+  letter-spacing: 3px;
+
+  color: #866951;
+}
+
+
+.game-header h1 {
+  margin: 4px 0;
+
+  font-size: 34px;
+
+  color: var(--brown-dark);
+}
+
+
+.game-header p {
+  margin: 5px 0;
+
+  color: #745c4b;
+}
+
+
+
+/* =========================
+   TURN PANEL
+========================= */
+
+.turn-panel {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 12px;
+
+  padding: 14px 17px;
+
+  border: 3px solid #c79768;
+
+  border-radius: 18px;
+
+  background: rgba(255,255,255,.88);
+
+  box-shadow:
+    0 6px 15px rgba(68,43,27,.1);
+}
+
+
+.turn-small {
+  margin-bottom: 2px;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 2px;
+
+  color: #98785f;
+}
+
+
+#turnName {
+  font-size: 20px;
+
+  font-weight: 900;
+}
+
+
+.progress-box {
+  text-align: right;
+}
+
+
+#progressText {
+  font-size: 19px;
+
+  font-weight: 900;
+}
+
+
+
+/* =========================
+   SCOREBOARD
+========================= */
+
+.score-board {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin-bottom: 14px;
+}
+
+
+.player-score {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  min-width: 0;
+
+  padding: 9px 11px;
+
+  border: 2px solid rgba(0,0,0,.1);
+
+  border-radius: 13px;
+
+  background: rgba(255,255,255,.75);
+
+  transition: .2s;
+}
+
+
+.player-score.current-player {
+  border-color: #b57946;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 3px rgba(181,121,70,.15);
+}
+
+
+.score-token {
+  flex: 0 0 auto;
+
+  font-size: 20px;
+}
+
+
+.score-name {
+  min-width: 0;
+
+  flex: 1;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  font-size: 13px;
+
+  font-weight: 800;
+}
+
+
+.score-stars {
+  flex: 0 0 auto;
+
+  font-size: 12px;
+
+  font-weight: 900;
+}
+
+
+
+/* =========================
+   BOARD
+========================= */
+
+#board {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 10px;
+
+  padding: 17px;
+
+  border: 6px solid #4b301f;
+
+  border-radius: 30px;
+
+  background:
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(255,255,255,.08),
+      transparent 25%
+    ),
+    linear-gradient(
+      145deg,
+      #8d5e3d,
+      #61402a
+    );
+
+  box-shadow:
+    inset 0 0 22px rgba(0,0,0,.28),
+    0 12px 28px rgba(68,43,27,.22);
+}
+
+
+
+/* SNAKE ROUTE */
+
+.space:nth-child(1)  { grid-column: 1; grid-row: 1; }
+.space:nth-child(2)  { grid-column: 2; grid-row: 1; }
+.space:nth-child(3)  { grid-column: 3; grid-row: 1; }
+.space:nth-child(4)  { grid-column: 4; grid-row: 1; }
+
+.space:nth-child(5)  { grid-column: 4; grid-row: 2; }
+.space:nth-child(6)  { grid-column: 3; grid-row: 2; }
+.space:nth-child(7)  { grid-column: 2; grid-row: 2; }
+.space:nth-child(8)  { grid-column: 1; grid-row: 2; }
+
+.space:nth-child(9)  { grid-column: 1; grid-row: 3; }
+.space:nth-child(10) { grid-column: 2; grid-row: 3; }
+.space:nth-child(11) { grid-column: 3; grid-row: 3; }
+.space:nth-child(12) { grid-column: 4; grid-row: 3; }
+
+.space:nth-child(13) { grid-column: 4; grid-row: 4; }
+.space:nth-child(14) { grid-column: 3; grid-row: 4; }
+.space:nth-child(15) { grid-column: 2; grid-row: 4; }
+.space:nth-child(16) { grid-column: 1; grid-row: 4; }
+
+.space:nth-child(17) { grid-column: 1; grid-row: 5; }
+.space:nth-child(18) { grid-column: 2; grid-row: 5; }
+.space:nth-child(19) { grid-column: 3; grid-row: 5; }
+.space:nth-child(20) { grid-column: 4; grid-row: 5; }
+
+
+
+.space {
+  position: relative;
+
+  min-width: 0;
+
+  aspect-ratio: 1 / 1;
+
+  padding: 6px;
+
+  border: 4px solid #ddd4c5;
+
+  border-radius: 50%;
+
+  background: #fffdf7;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+  box-shadow:
+    0 5px 0 rgba(64,45,32,.25),
+    0 8px 10px rgba(0,0,0,.15);
+
+  transition:
+    transform .2s,
+    box-shadow .2s;
+}
+
+
+.space small {
+  margin-top: 2px;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  color: #756b63;
+}
+
+
+.space-icon {
+  margin-bottom: 2px;
+
+  font-size: 24px;
+}
+
+
+.start-space {
+  border-color: #67a66d;
+
+  background: #dcf2d8;
+}
+
+
+.question-space {
+  border-color: var(--blue);
+
+  background: #dfedff;
+}
+
+
+.event-space {
+  border-color: var(--gold);
+
+  background: #fff1bc;
+}
+
+
+.school-space {
+  border-color: #6da6b1;
+
+  background: #d9eef1;
+}
+
+
+.danger-space {
+  border-color: var(--red);
+
+  background: #f5dada;
+}
+
+
+.bonus-space {
+  border-color: var(--purple);
+
+  background: #eee3ff;
+}
+
+
+.finish-space {
+  border-color: #4f9e5c;
+
+  background: #d5f2d7;
+
+  animation:
+    finishGlow 1.4s ease-in-out infinite;
+}
+
+
+.active-space {
+  z-index: 3;
+
+  transform: scale(1.08);
+
+  box-shadow:
+    0 0 0 4px rgba(255,255,255,.8),
+    0 0 23px rgba(255,213,92,.95);
+}
+
+
+@keyframes finishGlow {
+
+  0%,
+  100% {
+    box-shadow:
+      0 5px 0 rgba(64,45,32,.25),
+      0 0 8px rgba(79,158,92,.25);
+  }
+
+  50% {
+    box-shadow:
+      0 5px 0 rgba(64,45,32,.25),
+      0 0 22px rgba(79,158,92,.8);
+  }
+
+}
+
+
+
+/* =========================
+   PLAYER TOKENS
+========================= */
+
+.token-zone {
+  position: absolute;
+
+  right: -5px;
+
+  bottom: -6px;
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  justify-content: flex-end;
+
+  width: 48px;
+}
+
+
+.player-token {
+  width: 22px;
+
+  height: 22px;
+
+  margin: -2px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 2px solid white;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.95);
+
+  font-size: 15px;
+
+  box-shadow:
+    0 2px 5px rgba(0,0,0,.35);
+}
+
+
+
+/* =========================
+   DICE
+========================= */
+
+.dice-panel {
+  margin-top: 16px;
+
+  padding: 20px;
+
+  text-align: center;
+
+  border: 3px solid #c59668;
+
+  border-radius: 24px;
+
+  background: rgba(255,255,255,.92);
+
+  box-shadow:
+    0 8px 18px rgba(68,43,27,.13);
+}
+
+
+#diceVisual {
+  height: 70px;
+
+  line-height: 70px;
+
+  font-size: 65px;
+
+  color: var(--brown-dark);
+}
+
+
+#diceVisual.rolling {
+  animation:
+    diceShake .12s linear infinite;
+}
+
+
+@keyframes diceShake {
+
+  0% {
+    transform:
+      rotate(-8deg)
+      scale(.95);
+  }
+
+  50% {
+    transform:
+      rotate(8deg)
+      scale(1.08);
+  }
+
+  100% {
+    transform:
+      rotate(-8deg)
+      scale(.95);
+  }
+
+}
+
+
+#diceResult {
+  min-height: 28px;
+
+  margin: 6px 0 14px;
+
+  font-size: 17px;
+
+  font-weight: 800;
+}
+
+
+#rollButton {
+  width: 100%;
+
+  min-height: 58px;
+
+  border: none;
+
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      #94603b,
+      #5d3923
+    );
+
+  color: white;
+
+  font-size: 20px;
+
+  font-weight: 900;
+
+  box-shadow:
+    0 6px 0 #3d2517;
+
+  transition: .12s;
+}
+
+
+#rollButton:active:not(:disabled) {
+  transform: translateY(5px);
+
+  box-shadow:
+    0 1px 0 #3d2517;
+}
+
+
+#rollButton:disabled {
+  opacity: .5;
+
+  cursor: default;
+}
+
+
+
+/* =========================
+   MODALS
+========================= */
+
+.modal {
+  display: none;
+
+  position: fixed;
+
+  z-index: 1000;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 18px;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    rgba(35,24,18,.75);
+}
+
+
+.modal.open {
+  display: flex;
+}
+
+
+.modal-card {
+  width: 100%;
+
+  max-width: 440px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  padding: 28px 23px;
+
+  text-align: center;
+
+  border-radius: 27px;
+
+  background: var(--paper);
+
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.4);
+
+  animation:
+    modalPop .25s ease;
+}
+
+
+@keyframes modalPop {
+
+  from {
+    opacity: 0;
+
+    transform: scale(.82);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+
+}
+
+
+.modal-icon {
+  font-size: 50px;
+}
+
+
+.modal-label {
+  margin-top: 5px;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 3px;
+
+  color: #92745d;
+}
+
+
+.question-card {
+  border: 5px solid var(--blue);
+}
+
+
+.question-card h2 {
+  margin: 12px 0 20px;
+
+  line-height: 1.35;
+
+  font-size: 21px;
+}
+
+
+.answer-option {
+  width: 100%;
+
+  min-height: 52px;
+
+  margin: 9px 0;
+
+  padding: 11px;
+
+  text-align: left;
+
+  border: 2px solid #d9d9d9;
+
+  border-radius: 14px;
+
+  background: white;
+
+  color: #37312e;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  transition: .15s;
+}
+
+
+.answer-option:active:not(:disabled) {
+  transform: scale(.98);
+}
+
+
+.answer-option.correct-answer {
+  border-color: #65a96b;
+
+  background: #dcf2df;
+}
+
+
+.answer-option.wrong-answer {
+  border-color: #c96c68;
+
+  background: #f7dddd;
+}
+
+
+.answer-option:disabled {
+  cursor: default;
+}
+
+
+.feedback {
+  min-height: 26px;
+
+  margin-top: 12px;
+
+  font-size: 17px;
+
+  font-weight: 900;
+}
+
+
+
+/* EVENT */
+
+.event-card {
+  border: 5px solid var(--gold);
+}
+
+
+.event-big-icon {
+  font-size: 68px;
+}
+
+
+.event-card h2 {
+  margin: 10px 0;
+
+  font-size: 27px;
+}
+
+
+.event-card p {
+  line-height: 1.5;
+
+  font-size: 17px;
+}
+
+
+#eventContinue {
+  width: 100%;
+
+  min-height: 52px;
+
+  margin-top: 13px;
+
+  border: none;
+
+  border-radius: 15px;
+
+  background: var(--brown);
+
+  color: white;
+
+  font-size: 17px;
+
+  font-weight: 900;
+
+  box-shadow:
+    0 5px 0 var(--brown-dark);
+}
+
+
+
+/* VICTORY */
+
+.victory-card {
+  border: 6px solid var(--green);
+
+  background:
+    linear-gradient(
+      #fffdf4,
+      #eef9ec
+    );
+}
+
+
+.victory-icon {
+  font-size: 75px;
+}
+
+
+.victory-small {
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 3px;
+
+  color: #6c906e;
+}
+
+
+.victory-card h1 {
+  margin: 5px 0;
+
+  color: #438149;
+
+  font-size: 42px;
+}
+
+
+.victory-card h2 {
+  margin: 5px 0;
+
+  color: var(--brown-dark);
+}
+
+
+.winner-stars {
+  display: inline-block;
+
+  margin-top: 10px;
+
+  padding: 9px 15px;
+
+  border-radius: 20px;
+
+  background: #fff1b8;
+
+  font-size: 17px;
+}
+
+
+.story-ending {
+  margin-top: 20px;
+
+  color: #765d4c;
+
+  font-style: italic;
+}
+
+
+#restartButton {
+  width: 100%;
+
+  min-height: 55px;
+
+  margin-top: 15px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background: #5d9a62;
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  box-shadow:
+    0 5px 0 #376d3c;
+}
+
+
+
+/* =========================
+   CONFETTI
+========================= */
+
+.confetti-layer {
+  position: fixed;
+
+  z-index: 2000;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+
+  pointer-events: none;
+}
+
+
+.confetti {
+  position: absolute;
+
+  top: -20px;
+
+  width: 10px;
+
+  height: 16px;
+
+  border-radius: 2px;
+
+  animation:
+    confettiFall 2.8s linear forwards;
+}
+
+
+@keyframes confettiFall {
+
+  0% {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      rotate(0);
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translateY(100vh)
+      rotate(720deg);
+  }
+
+}
+
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 520px) {
+
+  body {
+    padding: 9px;
+  }
+
+
+  .start-screen {
+    margin: 14px auto;
+
+    padding: 28px 16px;
+  }
+
+
+  .start-logo {
+    font-size: 67px;
+  }
+
+
+  .start-title {
+    font-size: 32px;
+  }
+
+
+  .start-subtitle {
+    font-size: 19px;
+  }
+
+
+  .game-header h1 {
+    font-size: 27px;
+  }
+
+
+  #board {
+    gap: 6px;
+
+    padding: 10px;
+
+    border-width: 5px;
+
+    border-radius: 22px;
+  }
+
+
+  .space {
+    padding: 3px;
+
+    border-width: 3px;
+
+    font-size: 9px;
+  }
+
+
+  .space-icon {
+    font-size: 19px;
+  }
+
+
+  .space small {
+    font-size: 7px;
+  }
+
+
+  .player-token {
+    width: 19px;
+
+    height: 19px;
+
+    font-size: 12px;
+  }
+
+
+  .token-zone {
+    width: 40px;
+  }
+
+
+  .turn-panel {
+    padding: 11px 12px;
+  }
+
+
+  #turnName {
+    font-size: 17px;
+  }
+
+
+  #progressText {
+    font-size: 16px;
+  }
+
+
+  #diceVisual {
+    height: 58px;
+
+    line-height: 58px;
+
+    font-size: 54px;
+  }
+
+}
