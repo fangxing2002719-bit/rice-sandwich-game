@@ -4,29 +4,53 @@ const startScreen =
 const gameScreen =
   document.getElementById("gameScreen");
 
-const playerCountSelect =
-  document.getElementById("playerCount");
-
-const nameRows =
-  document.querySelectorAll(".name-row");
+const playerNameInput =
+  document.getElementById("playerName");
 
 const startButton =
   document.getElementById("startButton");
 
+const soundStart =
+  document.getElementById("soundStart");
+
+const soundGame =
+  document.getElementById("soundGame");
+
+
+const board =
+  document.getElementById("board");
+
 const spaces =
   document.querySelectorAll(".space");
 
-const scoreBoard =
-  document.getElementById("scoreBoard");
 
-const turnName =
-  document.getElementById("turnName");
+const heartsValue =
+  document.getElementById("heartsValue");
+
+const starsValue =
+  document.getElementById("starsValue");
+
+const streakValue =
+  document.getElementById("streakValue");
+
+const correctValue =
+  document.getElementById("correctValue");
+
+const chapterName =
+  document.getElementById("chapterName");
 
 const progressText =
   document.getElementById("progressText");
 
-const rollButton =
-  document.getElementById("rollButton");
+const progressFill =
+  document.getElementById("progressFill");
+
+const displayName =
+  document.getElementById("displayName");
+
+const rollCount =
+  document.getElementById("rollCount");
+
 
 const diceVisual =
   document.getElementById("diceVisual");
@@ -34,9 +58,15 @@ const diceVisual =
 const diceResult =
   document.getElementById("diceResult");
 
+const rollButton =
+  document.getElementById("rollButton");
+
 
 const questionModal =
   document.getElementById("questionModal");
+
+const questionBadge =
+  document.getElementById("questionBadge");
 
 const questionText =
   document.getElementById("questionText");
@@ -50,6 +80,9 @@ const questionFeedback =
 
 const eventModal =
   document.getElementById("eventModal");
+
+const eventLabel =
+  document.getElementById("eventLabel");
 
 const eventIcon =
   document.getElementById("eventIcon");
@@ -67,24 +100,91 @@ const eventContinue =
 const victoryModal =
   document.getElementById("victoryModal");
 
-const winnerName =
-  document.getElementById("winnerName");
+const finalName =
+  document.getElementById("finalName");
 
-const winnerStars =
-  document.getElementById("winnerStars");
+const finalScore =
+  document.getElementById("finalScore");
+
+const finalRank =
+  document.getElementById("finalRank");
+
+const finalStars =
+  document.getElementById("finalStars");
+
+const finalHearts =
+  document.getElementById("finalHearts");
+
+const finalCorrect =
+  document.getElementById("finalCorrect");
+
+const finalBestStreak =
+  document.getElementById("finalBestStreak");
+
+const finalRolls =
+  document.getElementById("finalRolls");
+
+const finalAnswered =
+  document.getElementById("finalAnswered");
 
 const restartButton =
   document.getElementById("restartButton");
+
 
 const confettiLayer =
   document.getElementById("confettiLayer");
 
 
-const tokenIcons = [
-  "🔵",
-  "🔴",
-  "🟢",
-  "🟣"
+
+/* =========================
+   GAME STATE
+========================= */
+
+const state = {
+
+  name: "Player",
+
+  position: 0,
+
+  hearts: 3,
+
+  maxHearts: 3,
+
+  stars: 0,
+
+  streak: 0,
+
+  bestStreak: 0,
+
+  correct: 0,
+
+  answered: 0,
+
+  rolls: 0,
+
+  skipTurns: 0,
+
+  busy: false,
+
+  gameOver: false,
+
+  sound: true
+
+};
+
+
+let playerToken = null;
+
+let questionDeck = [];
+
+const checkpointsSeen =
+  new Set();
+
+
+const mandatoryCheckpoints = [
+  7,
+  13,
+  21
 ];
 
 
@@ -96,15 +196,6 @@ const diceFaces = [
   "⚄",
   "⚅"
 ];
-
-
-let players = [];
-
-let currentPlayerIndex = 0;
-
-let busy = false;
-
-let gameOver = false;
 
 
 
@@ -120,11 +211,39 @@ const questions = [
 
     answers: [
       "She wants to feel like the special kids.",
-      "She wants to skip school.",
-      "She does not like eating lunch."
+      "She wants to skip class.",
+      "She wants to avoid her friends."
     ],
 
     correct: 0
+  },
+
+
+  {
+    question:
+      "Why are some students allowed to eat in the canteen?",
+
+    answers: [
+      "Their mothers are not home or they live too far away.",
+      "They have better grades.",
+      "They are older students."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "How long does Esperanza keep asking her mother?",
+
+    answers: [
+      "One day.",
+      "Three days.",
+      "One week."
+    ],
+
+    correct: 1
   },
 
 
@@ -135,7 +254,7 @@ const questions = [
     answers: [
       "A ham sandwich.",
       "A rice sandwich.",
-      "A cheese sandwich."
+      "A chicken sandwich."
     ],
 
     correct: 1
@@ -144,12 +263,12 @@ const questions = [
 
   {
     question:
-      "Who writes a letter for Esperanza?",
+      "Why does Esperanza have a rice sandwich?",
 
     answers: [
-      "Her mother.",
-      "Her teacher.",
-      "Sister Superior."
+      "They do not have lunch meat.",
+      "Rice is her favorite food.",
+      "The school requires rice."
     ],
 
     correct: 0
@@ -158,11 +277,53 @@ const questions = [
 
   {
     question:
-      "Who stops Esperanza before she can eat in the canteen?",
+      "Who writes the letter for Esperanza?",
 
     answers: [
-      "Her teacher.",
+      "Her mother.",
+      "Nenny.",
+      "Her teacher."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "Who stops Esperanza before she enters the canteen?",
+
+    answers: [
       "A nun.",
+      "Her mother.",
+      "Gloria."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "Where does the nun send Esperanza?",
+
+    answers: [
+      "Back home.",
+      "To Sister Superior.",
+      "To her classroom."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What does Sister Superior ask Esperanza to identify?",
+
+    answers: [
+      "Her classroom.",
+      "Her house.",
       "Her mother."
     ],
 
@@ -172,12 +333,12 @@ const questions = [
 
   {
     question:
-      "Who does Esperanza have to speak with at school?",
+      "About how far does Sister Superior say Esperanza lives from school?",
 
     answers: [
-      "Sister Superior.",
-      "Nenny.",
-      "Her English teacher."
+      "About three long blocks.",
+      "Ten miles.",
+      "One block."
     ],
 
     correct: 0
@@ -186,40 +347,26 @@ const questions = [
 
   {
     question:
-      "What does Sister Superior ask Esperanza to point out?",
-
-    answers: [
-      "Her classroom.",
-      "Her house.",
-      "The canteen."
-    ],
-
-    correct: 1
-  },
-
-
-  {
-    question:
-      "How does Esperanza react during the meeting with Sister Superior?",
+      "How does Esperanza react when Sister Superior questions her?",
 
     answers: [
       "She laughs.",
-      "She gets angry.",
-      "She cries."
+      "She cries.",
+      "She leaves."
     ],
 
-    correct: 2
+    correct: 1
   },
 
 
   {
     question:
-      "What does Sister Superior give Esperanza when she cries?",
+      "What does Esperanza ask for after she begins crying?",
 
     answers: [
       "A Kleenex.",
-      "A sandwich.",
-      "A book."
+      "A new sandwich.",
+      "A pencil."
     ],
 
     correct: 0
@@ -228,12 +375,26 @@ const questions = [
 
   {
     question:
-      "How long is Esperanza allowed to eat in the canteen?",
+      "How long does Sister Superior allow Esperanza to stay in the canteen?",
 
     answers: [
-      "Every day.",
-      "Only that day.",
-      "For one month."
+      "Only for that day.",
+      "For the rest of the year.",
+      "For one week."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "What is the rice like when Esperanza finally eats it?",
+
+    answers: [
+      "Hot.",
+      "Cold.",
+      "Sweet."
     ],
 
     correct: 1
@@ -242,15 +403,29 @@ const questions = [
 
   {
     question:
-      "How does Esperanza feel about the canteen at the end?",
+      "How does Esperanza describe the canteen at the end?",
 
     answers: [
-      "It is better than she imagined.",
-      "It is nothing special.",
-      "She wants to stay there all day."
+      "Amazing.",
+      "Nothing special.",
+      "Very beautiful."
     ],
 
     correct: 1
+  },
+
+
+  {
+    question:
+      "Why does Esperanza nod at the wrong house?",
+
+    answers: [
+      "She feels pressured and embarrassed.",
+      "She forgot where she lives.",
+      "She wants to move there."
+    ],
+
+    correct: 0
   }
 
 ];
@@ -258,99 +433,98 @@ const questions = [
 
 
 /* =========================
-   EVENT DATA
+   EVENTS
 ========================= */
 
 const events = {
 
   rice: {
+
     icon: "🥪",
 
     title:
       "Rice Sandwich",
 
     text:
-      "You have your lunch ready. Move forward 1 space!",
+      "Your lunch is ready. You earn 1 Star!",
 
-    move: 1
+    stars: 1
+
   },
 
 
   letter: {
+
     icon: "✉️",
 
     title:
       "Mother's Letter",
 
     text:
-      "Your mother wrote a letter for you. Earn 1 Star!",
+      "Your mother writes a note for the school. Move forward 1 extra space!",
 
-    stars: 1
+    move: 1
+
   },
 
 
   nun: {
+
     icon: "👩‍🦳",
 
     title:
       "The Nun",
 
     text:
-      "The nun stops you before the canteen. Go back 1 space!",
+      "The nun stops you before the canteen. Move back 1 space.",
 
     move: -1
-  },
 
-
-  sister: {
-    icon: "📚",
-
-    title:
-      "Sister Superior",
-
-    text:
-      "Sister Superior wants an answer. Get ready for another question!",
-
-    question: true
   },
 
 
   cry: {
+
     icon: "😢",
 
     title:
-      "Crying",
+      "Embarrassed",
 
     text:
-      "Esperanza feels embarrassed. You lose your next turn.",
+      "Esperanza feels embarrassed and begins to cry. You lose your next roll.",
 
     skip: 1
+
   },
 
 
   kleenex: {
+
     icon: "🤧",
 
     title:
       "Kleenex",
 
     text:
-      "You receive a Kleenex and feel a little better. Earn 1 Star!",
+      "You get a Kleenex. Recover 1 Heart!",
 
-    stars: 1
+    heal: 1
+
   },
 
 
   permission: {
+
     icon: "⭐",
 
     title:
-      "Permission",
+      "Permission Granted",
 
     text:
-      "You are allowed to eat in the canteen today. Earn 2 Stars!",
+      "Sister Superior lets you stay for today. You earn 2 Stars!",
 
     stars: 2
+
   }
 
 };
@@ -358,46 +532,64 @@ const events = {
 
 
 /* =========================
-   PLAYER SETUP
+   CHECKPOINT STORIES
 ========================= */
 
-function updatePlayerNameFields() {
+const checkpointStories = {
 
-  const count =
-    Number(playerCountSelect.value);
+  7: {
 
+    icon: "🏫",
 
-  nameRows.forEach(function (row, index) {
+    label:
+      "CHAPTER 2",
 
-    if (index < count) {
+    title:
+      "The School",
 
-      row.style.display = "flex";
+    text:
+      "Esperanza arrives at school carrying her mother's letter and her rice sandwich."
 
-    }
-
-    else {
-
-      row.style.display = "none";
-
-    }
-
-  });
-
-}
+  },
 
 
-playerCountSelect.addEventListener(
-  "change",
-  updatePlayerNameFields
-);
+  13: {
+
+    icon: "📚",
+
+    label:
+      "CHAPTER 3",
+
+    title:
+      "Sister Superior",
+
+    text:
+      "The nun sends Esperanza upstairs. Sister Superior reads the letter and asks where Esperanza lives."
+
+  },
 
 
-updatePlayerNameFields();
+  21: {
+
+    icon: "🚪",
+
+    label:
+      "CHAPTER 4",
+
+    title:
+      "The Canteen",
+
+    text:
+      "After an uncomfortable meeting, Esperanza is allowed to stay in the canteen for today."
+
+  }
+
+};
 
 
 
 /* =========================
-   START GAME
+   START
 ========================= */
 
 startButton.addEventListener(
@@ -408,281 +600,312 @@ startButton.addEventListener(
 
 function startGame() {
 
-  clearOldGame();
-
-  const playerCount =
-    Number(playerCountSelect.value);
+  resetState();
 
 
-  for (
-    let i = 0;
-    i < playerCount;
-    i++
-  ) {
-
-    const input =
-      document.getElementById(
-        "playerName" + i
-      );
+  const typedName =
+    playerNameInput.value.trim();
 
 
-    const typedName =
-      input.value.trim();
+  state.name =
+    typedName || "Player";
 
 
-    const player = {
-
-      name:
-        typedName ||
-        "Player " + (i + 1),
-
-      token:
-        tokenIcons[i],
-
-      position: 0,
-
-      stars: 0,
-
-      skipTurns: 0,
-
-      tokenElement: null
-
-    };
+  displayName.textContent =
+    state.name;
 
 
-    const token =
-      document.createElement("span");
-
-
-    token.className =
-      "player-token";
-
-
-    token.textContent =
-      player.token;
-
-
-    token.title =
-      player.name;
-
-
-    player.tokenElement =
-      token;
-
-
-    players.push(player);
-
-
-    const startTokenZone =
-      spaces[0].querySelector(
-        ".token-zone"
-      );
-
-
-    startTokenZone.appendChild(
-      token
-    );
-
-  }
-
-
-  currentPlayerIndex = 0;
-
-  busy = false;
-
-  gameOver = false;
+  createPlayerToken();
 
 
   startScreen.classList.add(
-    "screen-hidden"
+    "hidden"
   );
 
 
   gameScreen.classList.remove(
-    "screen-hidden"
+    "hidden"
   );
 
 
-  rollButton.disabled = false;
-
-  diceVisual.textContent = "⚀";
-
-  diceResult.textContent =
-    "Ready!";
+  ensureAudio();
 
 
-  updateInterface();
+  playTone(
+    440,
+    0.08
+  );
+
+
+  updateUI();
+
+
+  setTimeout(
+    function () {
+
+      spaces[0].scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+    },
+    150
+  );
 
 }
 
 
 
 /* =========================
-   CLEAN OLD GAME
+   RESET
 ========================= */
 
-function clearOldGame() {
+function resetState() {
 
-  players = [];
+  state.position = 0;
+
+  state.hearts = 3;
+
+  state.stars = 0;
+
+  state.streak = 0;
+
+  state.bestStreak = 0;
+
+  state.correct = 0;
+
+  state.answered = 0;
+
+  state.rolls = 0;
+
+  state.skipTurns = 0;
+
+  state.busy = false;
+
+  state.gameOver = false;
+
+
+  checkpointsSeen.clear();
+
+
+  questionDeck = [];
 
 
   document
-    .querySelectorAll(".player-token")
-    .forEach(function (token) {
+    .querySelectorAll(
+      ".player-token"
+    )
+    .forEach(
+      function (token) {
 
-      token.remove();
-
-    });
-
-
-  spaces.forEach(function (space) {
-
-    space.classList.remove(
-      "active-space"
-    );
-
-  });
-
-
-  scoreBoard.innerHTML = "";
-
-}
-
-
-
-/* =========================
-   UPDATE INTERFACE
-========================= */
-
-function updateInterface() {
-
-  if (players.length === 0) {
-    return;
-  }
-
-
-  const current =
-    players[currentPlayerIndex];
-
-
-  turnName.textContent =
-    current.token +
-    " " +
-    current.name;
-
-
-  progressText.textContent =
-    current.position +
-    " / " +
-    (spaces.length - 1);
-
-
-  spaces.forEach(function (space) {
-
-    space.classList.remove(
-      "active-space"
-    );
-
-  });
-
-
-  spaces[current.position]
-    .classList.add(
-      "active-space"
-    );
-
-
-  drawScoreBoard();
-
-}
-
-
-
-/* =========================
-   SCOREBOARD
-========================= */
-
-function drawScoreBoard() {
-
-  scoreBoard.innerHTML = "";
-
-
-  players.forEach(
-    function (player, index) {
-
-      const card =
-        document.createElement("div");
-
-
-      card.className =
-        "player-score";
-
-
-      if (
-        index === currentPlayerIndex
-      ) {
-
-        card.classList.add(
-          "current-player"
-        );
+        token.remove();
 
       }
+    );
 
 
-      const token =
-        document.createElement("span");
+  spaces.forEach(
+    function (space) {
 
-
-      token.className =
-        "score-token";
-
-
-      token.textContent =
-        player.token;
-
-
-      const name =
-        document.createElement("span");
-
-
-      name.className =
-        "score-name";
-
-
-      name.textContent =
-        player.name;
-
-
-      const stars =
-        document.createElement("span");
-
-
-      stars.className =
-        "score-stars";
-
-
-      stars.textContent =
-        "⭐ " + player.stars;
-
-
-      card.appendChild(token);
-
-      card.appendChild(name);
-
-      card.appendChild(stars);
-
-
-      scoreBoard.appendChild(card);
+      space.classList.remove(
+        "active-space"
+      );
 
     }
   );
 
+
+  closeModal(
+    questionModal
+  );
+
+
+  closeModal(
+    eventModal
+  );
+
+
+  closeModal(
+    victoryModal
+  );
+
+
+  confettiLayer.innerHTML =
+    "";
+
+
+
+  rollButton.disabled =
+    false;
+
+
+  diceVisual.textContent =
+    "⚀";
+
+
+  diceResult.textContent =
+    "Ready for your journey!";
+
 }
 
 
 
 /* =========================
-   ROLL DICE
+   PLAYER TOKEN
+========================= */
+
+function createPlayerToken() {
+
+  playerToken =
+    document.createElement(
+      "div"
+    );
+
+
+  playerToken.className =
+    "player-token";
+
+
+  playerToken.textContent =
+    "👧";
+
+
+  spaces[0]
+    .querySelector(
+      ".token-zone"
+    )
+    .appendChild(
+      playerToken
+    );
+
+}
+
+
+
+/* =========================
+   UI
+========================= */
+
+function updateUI() {
+
+  heartsValue.textContent =
+    renderHearts();
+
+
+  starsValue.textContent =
+    state.stars;
+
+
+  streakValue.textContent =
+    state.streak;
+
+
+  correctValue.textContent =
+    state.correct;
+
+
+  rollCount.textContent =
+    state.rolls;
+
+
+  chapterName.textContent =
+    getChapterName(
+      state.position
+    );
+
+
+  progressText.textContent =
+    state.position +
+    " / " +
+    (spaces.length - 1);
+
+
+  const percent =
+    (
+      state.position /
+      (spaces.length - 1)
+    ) * 100;
+
+
+  progressFill.style.width =
+    percent + "%";
+
+
+  spaces.forEach(
+    function (space) {
+
+      space.classList.remove(
+        "active-space"
+      );
+
+    }
+  );
+
+
+  spaces[
+    state.position
+  ].classList.add(
+    "active-space"
+  );
+
+}
+
+
+function renderHearts() {
+
+  let result = "";
+
+
+  for (
+    let i = 0;
+    i < state.maxHearts;
+    i++
+  ) {
+
+    result +=
+      i < state.hearts
+        ? "❤️"
+        : "🖤";
+
+  }
+
+
+  return result;
+
+}
+
+
+function getChapterName(position) {
+
+  if (position <= 6) {
+
+    return "Chapter 1 · Home";
+
+  }
+
+
+  if (position <= 12) {
+
+    return "Chapter 2 · School";
+
+  }
+
+
+  if (position <= 20) {
+
+    return "Chapter 3 · Sister Superior";
+
+  }
+
+
+  return "Chapter 4 · Canteen";
+
+}
+
+
+
+/* =========================
+   DICE
 ========================= */
 
 rollButton.addEventListener(
@@ -694,40 +917,50 @@ rollButton.addEventListener(
 function rollDice() {
 
   if (
-    busy ||
-    gameOver
+    state.busy ||
+    state.gameOver
   ) {
 
     return;
   }
 
 
-  const player =
-    players[currentPlayerIndex];
-
-
-  /* SKIPPED TURN */
+  /* SKIP TURN */
 
   if (
-    player.skipTurns > 0
+    state.skipTurns > 0
   ) {
 
-    busy = true;
+    state.busy = true;
 
-    rollButton.disabled = true;
+    rollButton.disabled =
+      true;
 
-    player.skipTurns--;
+
+    state.skipTurns--;
 
 
     diceResult.textContent =
-      "😢 " +
-      player.name +
-      " loses this turn!";
+      "😢 You lose this roll.";
+
+
+    playLowTone();
 
 
     setTimeout(
-      endTurn,
-      1200
+      function () {
+
+        state.busy = false;
+
+        rollButton.disabled =
+          false;
+
+
+        diceResult.textContent =
+          "You can roll again!";
+
+      },
+      1000
     );
 
 
@@ -735,9 +968,16 @@ function rollDice() {
   }
 
 
-  busy = true;
+  state.busy = true;
 
-  rollButton.disabled = true;
+  rollButton.disabled =
+    true;
+
+
+  state.rolls++;
+
+
+  updateUI();
 
 
   diceVisual.classList.add(
@@ -745,114 +985,211 @@ function rollDice() {
   );
 
 
-  let count = 0;
+  playRollSound();
+
+
+  let animationCount = 0;
 
 
   const animation =
-    setInterval(function () {
+    setInterval(
+      function () {
 
-      const fakeRoll =
-        Math.floor(
-          Math.random() * 6
-        );
-
-
-      diceVisual.textContent =
-        diceFaces[fakeRoll];
-
-
-      count++;
-
-
-      if (count >= 10) {
-
-        clearInterval(
-          animation
-        );
-
-
-        diceVisual.classList.remove(
-          "rolling"
-        );
-
-
-        const roll =
+        const fake =
           Math.floor(
             Math.random() * 6
-          ) + 1;
+          );
 
 
         diceVisual.textContent =
-          diceFaces[roll - 1];
+          diceFaces[fake];
 
 
-        diceResult.textContent =
-          player.name +
-          " rolled " +
-          roll +
-          "!";
+        animationCount++;
 
 
-        movePlayer(
-          player,
-          roll
-        );
+        if (
+          animationCount >= 10
+        ) {
 
-      }
+          clearInterval(
+            animation
+          );
 
-    }, 85);
+
+          diceVisual.classList.remove(
+            "rolling"
+          );
+
+
+          const roll =
+            weightedRoll();
+
+
+          diceVisual.textContent =
+            diceFaces[
+              roll - 1
+            ];
+
+
+          diceResult.textContent =
+            "You rolled " +
+            roll +
+            "!";
+
+
+          movePlayer(
+            roll
+          );
+
+        }
+
+      },
+      75
+    );
+
+}
+
+
+
+/* 1 = 40%
+   2 = 40%
+   3 = 20%
+*/
+
+function weightedRoll() {
+
+  const chance =
+    Math.random();
+
+
+  if (
+    chance < 0.40
+  ) {
+
+    return 1;
+
+  }
+
+
+  if (
+    chance < 0.80
+  ) {
+
+    return 2;
+
+  }
+
+
+  return 3;
 
 }
 
 
 
 /* =========================
-   MOVE PLAYER
+   TARGET / CHECKPOINT
 ========================= */
 
-async function movePlayer(
-  player,
+function getTargetPosition(
   steps
 ) {
 
-  const target =
+  let target =
     Math.min(
-      player.position + steps,
+      state.position + steps,
       spaces.length - 1
     );
 
 
-  while (
-    player.position < target
+  for (
+    const checkpoint
+    of mandatoryCheckpoints
   ) {
 
-    await wait(250);
+    if (
+      !checkpointsSeen.has(
+        checkpoint
+      ) &&
+      checkpoint >
+        state.position &&
+      checkpoint <= target
+    ) {
 
+      target =
+        checkpoint;
 
-    player.position++;
+      break;
 
-
-    const zone =
-      spaces[player.position]
-        .querySelector(
-          ".token-zone"
-        );
-
-
-    zone.appendChild(
-      player.tokenElement
-    );
-
-
-    updateInterface();
+    }
 
   }
 
 
-  await wait(300);
+  return target;
+
+}
 
 
-  resolveSpace(player);
+
+/* =========================
+   MOVE
+========================= */
+
+async function movePlayer(
+  steps
+) {
+
+  const target =
+    getTargetPosition(
+      steps
+    );
+
+
+  while (
+    state.position < target
+  ) {
+
+    await wait(260);
+
+
+    state.position++;
+
+
+    spaces[
+      state.position
+    ]
+      .querySelector(
+        ".token-zone"
+      )
+      .appendChild(
+        playerToken
+      );
+
+
+    playMoveSound();
+
+
+    updateUI();
+
+
+    spaces[
+      state.position
+    ].scrollIntoView({
+
+      behavior: "smooth",
+
+      block: "center"
+
+    });
+
+  }
+
+
+  await wait(250);
+
+
+  resolveSpace();
 
 }
 
@@ -862,87 +1199,266 @@ async function movePlayer(
    RESOLVE SPACE
 ========================= */
 
-function resolveSpace(player) {
+function resolveSpace() {
 
   const space =
-    spaces[player.position];
+    spaces[
+      state.position
+    ];
 
 
   const type =
     space.dataset.type;
 
 
-  if (type === "finish") {
+  if (
+    type === "finish"
+  ) {
 
-    showVictory(player);
-
-    return;
-  }
-
-
-  if (type === "question") {
-
-    showQuestion(player);
+    showVictory();
 
     return;
   }
 
 
-  if (type === "event") {
+  if (
+    type === "checkpoint"
+  ) {
 
-    const eventKey =
-      space.dataset.event;
-
-
-    showEvent(
-      player,
-      eventKey
+    checkpointsSeen.add(
+      state.position
     );
 
+
+    showCheckpoint(
+      state.position
+    );
+
+
     return;
   }
 
 
-  setTimeout(
-    endTurn,
-    500
-  );
+  if (
+    type === "question"
+  ) {
+
+    const challenge =
+      space.dataset
+        .challenge === "true";
+
+
+    showQuestion(
+      challenge
+    );
+
+
+    return;
+  }
+
+
+  if (
+    type === "event"
+  ) {
+
+    showSpecialEvent(
+      space.dataset.event
+    );
+
+
+    return;
+  }
+
+
+  finishAction();
 
 }
 
 
 
 /* =========================
-   QUESTIONS
+   CHECKPOINT
 ========================= */
 
-function showQuestion(player) {
+function showCheckpoint(
+  position
+) {
 
-  const question =
-    questions[
+  const story =
+    checkpointStories[
+      position
+    ];
+
+
+  if (!story) {
+
+    finishAction();
+
+    return;
+  }
+
+
+  eventLabel.textContent =
+    story.label;
+
+
+  eventIcon.textContent =
+    story.icon;
+
+
+  eventTitle.textContent =
+    story.title;
+
+
+  eventText.textContent =
+    story.text;
+
+
+  eventContinue.textContent =
+    "CONTINUE";
+
+
+  openModal(
+    eventModal
+  );
+
+
+  playEventSound();
+
+
+  eventContinue.onclick =
+    function () {
+
+      eventContinue.onclick =
+        null;
+
+
+      closeModal(
+        eventModal
+      );
+
+
+      finishAction();
+
+    };
+
+}
+
+
+
+/* =========================
+   QUESTION DECK
+========================= */
+
+function nextQuestion() {
+
+  if (
+    questionDeck.length === 0
+  ) {
+
+    questionDeck =
+      [...questions];
+
+
+    shuffle(
+      questionDeck
+    );
+
+  }
+
+
+  return questionDeck.pop();
+
+}
+
+
+function shuffle(array) {
+
+  for (
+    let i =
+      array.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
       Math.floor(
         Math.random() *
-        questions.length
-      )
+        (i + 1)
+      );
+
+
+    [
+      array[i],
+      array[j]
+    ] =
+    [
+      array[j],
+      array[i]
     ];
+
+  }
+
+}
+
+
+
+/* =========================
+   QUESTION
+========================= */
+
+function showQuestion(
+  challenge = false
+) {
+
+  const question =
+    nextQuestion();
+
+
+  const reward =
+    challenge
+      ? 2
+      : 1;
+
+
+  questionBadge.textContent =
+    challenge
+      ? "⚡ CHALLENGE QUESTION · 2 STARS"
+      : "QUESTION · 1 STAR";
 
 
   questionText.textContent =
     question.question;
 
 
-  answerOptions.innerHTML = "";
+  answerOptions.innerHTML =
+    "";
 
-  questionFeedback.textContent = "";
+
+  questionFeedback
+    .textContent =
+    "";
+
+
+  openModal(
+    questionModal
+  );
 
 
   question.answers.forEach(
-    function (answer, index) {
+    function (
+      answer,
+      index
+    ) {
 
       const button =
         document.createElement(
           "button"
         );
+
+
+      button.type =
+        "button";
 
 
       button.className =
@@ -959,108 +1475,25 @@ function showQuestion(player) {
 
       button.addEventListener(
         "click",
-        async function () {
+        function () {
 
-          const allButtons =
-            answerOptions
-              .querySelectorAll(
-                ".answer-option"
-              );
-
-
-          allButtons.forEach(
-            function (btn) {
-
-              btn.disabled = true;
-
-            }
+          answerQuestion(
+            button,
+            index,
+            question,
+            reward
           );
-
-
-          if (
-            index ===
-            question.correct
-          ) {
-
-            button.classList.add(
-              "correct-answer"
-            );
-
-
-            player.stars++;
-
-
-            questionFeedback
-              .textContent =
-              "✅ Correct! +1 Star";
-
-
-            drawScoreBoard();
-
-
-            await wait(1000);
-
-
-            closeModal(
-              questionModal
-            );
-
-
-            endTurn();
-
-          }
-
-          else {
-
-            button.classList.add(
-              "wrong-answer"
-            );
-
-
-            allButtons[
-              question.correct
-            ].classList.add(
-              "correct-answer"
-            );
-
-
-            questionFeedback
-              .textContent =
-              "❌ Wrong! Go back 1 space.";
-
-
-            await wait(1100);
-
-
-            closeModal(
-              questionModal
-            );
-
-
-            await moveBackward(
-              player,
-              1
-            );
-
-
-            endTurn();
-
-          }
 
         }
       );
 
 
-      answerOptions.appendChild(
-        button
-      );
+      answerOptions
+        .appendChild(
+          button
+        );
 
     }
-  );
-
-
-  openModal(
-    questionModal
   );
 
 }
@@ -1068,11 +1501,134 @@ function showQuestion(player) {
 
 
 /* =========================
-   SPECIAL EVENTS
+   ANSWER
 ========================= */
 
-function showEvent(
-  player,
+async function answerQuestion(
+  button,
+  selectedIndex,
+  question,
+  reward
+) {
+
+  const buttons =
+    answerOptions
+      .querySelectorAll(
+        ".answer-option"
+      );
+
+
+  buttons.forEach(
+    function (item) {
+
+      item.disabled = true;
+
+    }
+  );
+
+
+  state.answered++;
+
+
+  if (
+    selectedIndex ===
+    question.correct
+  ) {
+
+    state.correct++;
+
+
+    state.stars +=
+      reward;
+
+
+    state.streak++;
+
+
+    state.bestStreak =
+      Math.max(
+        state.bestStreak,
+        state.streak
+      );
+
+
+    button.classList.add(
+      "correct"
+    );
+
+
+    questionFeedback
+      .textContent =
+      reward === 2
+        ? "⚡ Correct! +2 Stars"
+        : "✅ Correct! +1 Star";
+
+
+    playCorrectSound();
+
+  }
+
+  else {
+
+    state.hearts =
+      Math.max(
+        0,
+        state.hearts - 1
+      );
+
+
+    state.streak = 0;
+
+
+    button.classList.add(
+      "wrong"
+    );
+
+
+    buttons[
+      question.correct
+    ].classList.add(
+      "correct"
+    );
+
+
+    questionFeedback
+      .textContent =
+      "❌ Correct answer: " +
+      question.answers[
+        question.correct
+      ];
+
+
+    playWrongSound();
+
+  }
+
+
+  updateUI();
+
+
+  await wait(
+    1250
+  );
+
+
+  closeModal(
+    questionModal
+  );
+
+
+  finishAction();
+
+}
+
+
+
+/* =========================
+   SPECIAL EVENT
+========================= */
+
+function showSpecialEvent(
   eventKey
 ) {
 
@@ -1082,10 +1638,14 @@ function showEvent(
 
   if (!event) {
 
-    endTurn();
+    finishAction();
 
     return;
   }
+
+
+  eventLabel.textContent =
+    "SPECIAL EVENT";
 
 
   eventIcon.textContent =
@@ -1100,15 +1660,23 @@ function showEvent(
     event.text;
 
 
+  eventContinue.textContent =
+    "CONTINUE";
+
+
   openModal(
     eventModal
   );
 
 
+  playEventSound();
+
+
   eventContinue.onclick =
     async function () {
 
-      eventContinue.onclick = null;
+      eventContinue.onclick =
+        null;
 
 
       closeModal(
@@ -1116,73 +1684,55 @@ function showEvent(
       );
 
 
-      /* MOVEMENT */
+      if (
+        event.stars
+      ) {
 
-      if (event.move) {
-
-        if (event.move > 0) {
-
-          await moveForwardBonus(
-            player,
-            event.move
-          );
-
-        }
-
-        else {
-
-          await moveBackward(
-            player,
-            Math.abs(
-              event.move
-            )
-          );
-
-        }
-
-      }
-
-
-      /* STARS */
-
-      if (event.stars) {
-
-        player.stars +=
+        state.stars +=
           event.stars;
 
+      }
 
-        drawScoreBoard();
+
+      if (
+        event.heal
+      ) {
+
+        state.hearts =
+          Math.min(
+            state.maxHearts,
+            state.hearts +
+            event.heal
+          );
 
       }
 
 
-      /* SKIP */
+      if (
+        event.skip
+      ) {
 
-      if (event.skip) {
-
-        player.skipTurns +=
+        state.skipTurns +=
           event.skip;
 
       }
 
 
-      /* EXTRA QUESTION */
+      updateUI();
 
-      if (event.question) {
 
-        await wait(300);
+      if (
+        event.move
+      ) {
 
-        showQuestion(player);
-
-        return;
+        await moveBonus(
+          event.move
+        );
 
       }
 
 
-      await wait(300);
-
-
-      endTurn();
+      finishAction();
 
     };
 
@@ -1194,115 +1744,129 @@ function showEvent(
    BONUS MOVEMENT
 ========================= */
 
-async function moveForwardBonus(
-  player,
-  steps
+async function moveBonus(
+  amount
 ) {
 
-  const target =
-    Math.min(
-      player.position + steps,
-      spaces.length - 1
-    );
-
-
-  while (
-    player.position < target
+  if (
+    amount > 0
   ) {
 
-    await wait(250);
-
-
-    player.position++;
-
-
-    spaces[player.position]
-      .querySelector(
-        ".token-zone"
-      )
-      .appendChild(
-        player.tokenElement
+    const target =
+      Math.min(
+        state.position +
+        amount,
+        spaces.length - 1
       );
 
 
-    updateInterface();
+    while (
+      state.position <
+      target
+    ) {
+
+      await wait(250);
+
+
+      state.position++;
+
+
+      spaces[
+        state.position
+      ]
+        .querySelector(
+          ".token-zone"
+        )
+        .appendChild(
+          playerToken
+        );
+
+
+      playMoveSound();
+
+
+      updateUI();
+
+    }
 
   }
 
-}
+  else {
 
-
-
-async function moveBackward(
-  player,
-  steps
-) {
-
-  const target =
-    Math.max(
-      0,
-      player.position - steps
-    );
-
-
-  while (
-    player.position > target
-  ) {
-
-    await wait(250);
-
-
-    player.position--;
-
-
-    spaces[player.position]
-      .querySelector(
-        ".token-zone"
-      )
-      .appendChild(
-        player.tokenElement
+    const target =
+      Math.max(
+        0,
+        state.position +
+        amount
       );
 
 
-    updateInterface();
+    while (
+      state.position >
+      target
+    ) {
+
+      await wait(250);
+
+
+      state.position--;
+
+
+      spaces[
+        state.position
+      ]
+        .querySelector(
+          ".token-zone"
+        )
+        .appendChild(
+          playerToken
+        );
+
+
+      playMoveSound();
+
+
+      updateUI();
+
+    }
 
   }
+
+
+  spaces[
+    state.position
+  ].scrollIntoView({
+
+    behavior: "smooth",
+
+    block: "center"
+
+  });
 
 }
 
 
 
 /* =========================
-   END TURN
+   FINISH ACTION
 ========================= */
 
-function endTurn() {
+function finishAction() {
 
-  if (gameOver) {
-    return;
-  }
+  state.busy = false;
 
 
-  currentPlayerIndex =
-    (
-      currentPlayerIndex + 1
-    ) %
-    players.length;
-
-
-  busy = false;
-
-
-  rollButton.disabled = false;
+  rollButton.disabled =
+    false;
 
 
   diceResult.textContent =
-    players[currentPlayerIndex]
-      .name +
-    "'s turn!";
+    state.skipTurns > 0
+      ? "⚠️ Your next roll will be skipped."
+      : "Ready to roll!";
 
 
-  updateInterface();
+  updateUI();
 
 }
 
@@ -1312,31 +1876,505 @@ function endTurn() {
    VICTORY
 ========================= */
 
-function showVictory(player) {
+function showVictory() {
 
-  gameOver = true;
+  state.gameOver = true;
 
-  busy = true;
-
-  rollButton.disabled = true;
+  state.busy = true;
 
 
-  winnerName.textContent =
-    player.token +
-    " " +
-    player.name;
+  rollButton.disabled =
+    true;
 
 
-  winnerStars.textContent =
-    player.stars;
+  const score =
+    calculateScore();
 
 
-  victoryModal.classList.add(
-    "open"
+  finalName.textContent =
+    state.name;
+
+
+  finalScore.textContent =
+    score.toLocaleString();
+
+
+  finalRank.textContent =
+    getRank(
+      score
+    );
+
+
+  finalStars.textContent =
+    state.stars;
+
+
+  finalHearts.textContent =
+    state.hearts;
+
+
+  finalCorrect.textContent =
+    state.correct +
+    " / " +
+    state.answered;
+
+
+  finalBestStreak
+    .textContent =
+    state.bestStreak;
+
+
+  finalRolls.textContent =
+    state.rolls;
+
+
+  finalAnswered.textContent =
+    state.answered;
+
+
+  openModal(
+    victoryModal
   );
 
 
+  playVictorySound();
+
+
   launchConfetti();
+
+}
+
+
+
+/* =========================
+   SCORE
+========================= */
+
+function calculateScore() {
+
+  const starScore =
+    state.stars * 500;
+
+
+  const correctScore =
+    state.correct * 650;
+
+
+  const streakScore =
+    state.bestStreak * 250;
+
+
+  const heartScore =
+    state.hearts * 300;
+
+
+  const rollBonus =
+    Math.max(
+      0,
+      2500 -
+      state.rolls * 100
+    );
+
+
+  return (
+    starScore +
+    correctScore +
+    streakScore +
+    heartScore +
+    rollBonus
+  );
+
+}
+
+
+function getRank(score) {
+
+  if (
+    score >= 8000
+  ) {
+
+    return "🏆 Story Expert";
+
+  }
+
+
+  if (
+    score >= 6000
+  ) {
+
+    return "⭐ Great Reader";
+
+  }
+
+
+  if (
+    score >= 4000
+  ) {
+
+    return "📖 Story Explorer";
+
+  }
+
+
+  return "🥪 Journey Complete";
+
+}
+
+
+
+/* =========================
+   PLAY AGAIN
+========================= */
+
+restartButton.addEventListener(
+  "click",
+  function () {
+
+    closeModal(
+      victoryModal
+    );
+
+
+    gameScreen.classList.add(
+      "hidden"
+    );
+
+
+    startScreen.classList.remove(
+      "hidden"
+    );
+
+
+    confettiLayer.innerHTML =
+      "";
+
+
+    resetState();
+
+  }
+);
+
+
+
+/* =========================
+   SOUND TOGGLE
+========================= */
+
+soundStart.addEventListener(
+  "click",
+  toggleSound
+);
+
+
+soundGame.addEventListener(
+  "click",
+  toggleSound
+);
+
+
+function toggleSound() {
+
+  state.sound =
+    !state.sound;
+
+
+  updateSoundButtons();
+
+
+  if (
+    state.sound
+  ) {
+
+    ensureAudio();
+
+
+    playTone(
+      520,
+      0.07
+    );
+
+  }
+
+}
+
+
+function updateSoundButtons() {
+
+  soundStart.textContent =
+    state.sound
+      ? "🔊 Sound On"
+      : "🔇 Sound Off";
+
+
+  soundGame.textContent =
+    state.sound
+      ? "🔊"
+      : "🔇";
+
+}
+
+
+updateSoundButtons();
+
+
+
+/* =========================
+   AUDIO
+========================= */
+
+let audioContext = null;
+
+
+function ensureAudio() {
+
+  if (
+    !state.sound
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    !audioContext
+  ) {
+
+    const AudioContext =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+
+    if (
+      AudioContext
+    ) {
+
+      audioContext =
+        new AudioContext();
+
+    }
+
+  }
+
+
+  if (
+    audioContext &&
+    audioContext.state ===
+      "suspended"
+  ) {
+
+    audioContext.resume();
+
+  }
+
+}
+
+
+function playTone(
+  frequency,
+  duration,
+  type = "sine",
+  volume = 0.035
+) {
+
+  if (
+    !state.sound
+  ) {
+
+    return;
+
+  }
+
+
+  ensureAudio();
+
+
+  if (
+    !audioContext
+  ) {
+
+    return;
+
+  }
+
+
+  const oscillator =
+    audioContext
+      .createOscillator();
+
+
+  const gain =
+    audioContext
+      .createGain();
+
+
+  oscillator.type =
+    type;
+
+
+  oscillator.frequency.value =
+    frequency;
+
+
+  gain.gain.value =
+    volume;
+
+
+  oscillator.connect(
+    gain
+  );
+
+
+  gain.connect(
+    audioContext.destination
+  );
+
+
+  oscillator.start();
+
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.0001,
+    audioContext.currentTime +
+    duration
+  );
+
+
+  oscillator.stop(
+    audioContext.currentTime +
+    duration
+  );
+
+}
+
+
+function playRollSound() {
+
+  playTone(
+    240,
+    0.08,
+    "square",
+    .018
+  );
+
+}
+
+
+function playMoveSound() {
+
+  playTone(
+    430 +
+      state.position * 4,
+    0.05,
+    "sine",
+    .022
+  );
+
+}
+
+
+function playCorrectSound() {
+
+  playTone(
+    600,
+    0.12
+  );
+
+
+  setTimeout(
+    function () {
+
+      playTone(
+        780,
+        0.14
+      );
+
+    },
+    90
+  );
+
+}
+
+
+function playWrongSound() {
+
+  playTone(
+    190,
+    0.22,
+    "sawtooth",
+    .025
+  );
+
+}
+
+
+function playLowTone() {
+
+  playTone(
+    170,
+    0.15,
+    "sine",
+    .03
+  );
+
+}
+
+
+function playEventSound() {
+
+  playTone(
+    500,
+    0.08
+  );
+
+
+  setTimeout(
+    function () {
+
+      playTone(
+        650,
+        0.09
+      );
+
+    },
+    80
+  );
+
+}
+
+
+function playVictorySound() {
+
+  const notes = [
+    523,
+    659,
+    784,
+    1047
+  ];
+
+
+  notes.forEach(
+    function (
+      frequency,
+      index
+    ) {
+
+      setTimeout(
+        function () {
+
+          playTone(
+            frequency,
+            0.22,
+            "sine",
+            .035
+          );
+
+        },
+        index * 140
+      );
+
+    }
+  );
 
 }
 
@@ -1348,21 +2386,22 @@ function showVictory(player) {
 
 function launchConfetti() {
 
-  confettiLayer.innerHTML = "";
+  confettiLayer.innerHTML =
+    "";
 
 
   const colors = [
-    "#e9b949",
-    "#6e9fda",
-    "#67a96c",
-    "#c96c68",
-    "#937ac0"
+    "#dfb64e",
+    "#6d9fdc",
+    "#63a66a",
+    "#ca6c68",
+    "#9279c1"
   ];
 
 
   for (
     let i = 0;
-    i < 80;
+    i < 90;
     i++
   ) {
 
@@ -1398,9 +2437,11 @@ function launchConfetti() {
 
 
     piece.style.animationDuration =
-      2 +
-      Math.random() *
-      2 +
+      (
+        2 +
+        Math.random() *
+        2
+      ) +
       "s";
 
 
@@ -1418,7 +2459,7 @@ function launchConfetti() {
         "";
 
     },
-    5000
+    5200
   );
 
 }
@@ -1426,56 +2467,7 @@ function launchConfetti() {
 
 
 /* =========================
-   PLAY AGAIN
-========================= */
-
-restartButton.addEventListener(
-  "click",
-  function () {
-
-    closeModal(
-      victoryModal
-    );
-
-
-    confettiLayer.innerHTML =
-      "";
-
-
-    clearOldGame();
-
-
-    gameScreen.classList.add(
-      "screen-hidden"
-    );
-
-
-    startScreen.classList.remove(
-      "screen-hidden"
-    );
-
-
-    gameOver = false;
-
-    busy = false;
-
-    currentPlayerIndex = 0;
-
-
-    diceVisual.textContent =
-      "⚀";
-
-
-    diceResult.textContent =
-      "Ready!";
-
-  }
-);
-
-
-
-/* =========================
-   MODAL HELPERS
+   MODALS
 ========================= */
 
 function openModal(modal) {
