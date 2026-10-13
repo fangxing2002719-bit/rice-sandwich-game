@@ -16,13 +16,8 @@ const soundStart =
 const soundGame =
   document.getElementById("soundGame");
 
-
-const board =
-  document.getElementById("board");
-
 const spaces =
   document.querySelectorAll(".space");
-
 
 const heartsValue =
   document.getElementById("heartsValue");
@@ -51,7 +46,6 @@ const displayName =
 const rollCount =
   document.getElementById("rollCount");
 
-
 const diceVisual =
   document.getElementById("diceVisual");
 
@@ -60,7 +54,6 @@ const diceResult =
 
 const rollButton =
   document.getElementById("rollButton");
-
 
 const questionModal =
   document.getElementById("questionModal");
@@ -76,7 +69,6 @@ const answerOptions =
 
 const questionFeedback =
   document.getElementById("questionFeedback");
-
 
 const eventModal =
   document.getElementById("eventModal");
@@ -95,7 +87,6 @@ const eventText =
 
 const eventContinue =
   document.getElementById("eventContinue");
-
 
 const victoryModal =
   document.getElementById("victoryModal");
@@ -130,52 +121,43 @@ const finalAnswered =
 const restartButton =
   document.getElementById("restartButton");
 
-
 const confettiLayer =
   document.getElementById("confettiLayer");
 
 
-
-/* =========================
+/* =========================================
    GAME STATE
-========================= */
+========================================= */
 
 const state = {
-
   name: "Player",
 
   position: 0,
 
   hearts: 3,
-
   maxHearts: 3,
 
   stars: 0,
 
   streak: 0,
-
   bestStreak: 0,
 
   correct: 0,
-
   answered: 0,
 
   rolls: 0,
 
-  skipTurns: 0,
-
   busy: false,
-
   gameOver: false,
 
   sound: true
-
 };
 
 
 let playerToken = null;
 
 let questionDeck = [];
+
 
 const checkpointsSeen =
   new Set();
@@ -188,6 +170,23 @@ const mandatoryCheckpoints = [
 ];
 
 
+/*
+Only FOUR question spaces:
+3  = Question 1
+9  = Question 2
+14 = Challenge
+24 = Final Challenge
+*/
+
+const realQuestionSpaces =
+  new Set([
+    3,
+    9,
+    14,
+    24
+  ]);
+
+
 const diceFaces = [
   "⚀",
   "⚁",
@@ -198,10 +197,93 @@ const diceFaces = [
 ];
 
 
+/* =========================================
+   CHANGE EXTRA QUESTIONS INTO NORMAL SPACES
+========================================= */
 
-/* =========================
+function cleanBoardQuestions() {
+
+  spaces.forEach(
+    function (space, index) {
+
+      if (
+        space.dataset.type === "question" &&
+        !realQuestionSpaces.has(index)
+      ) {
+
+        space.dataset.type =
+          "normal";
+
+
+        space.dataset.challenge =
+          "false";
+
+
+        space.classList.remove(
+          "question-space"
+        );
+
+
+        space.classList.remove(
+          "challenge-space"
+        );
+
+
+        space.classList.add(
+          "normal-space"
+        );
+
+
+        const icon =
+          space.querySelector(
+            ".space-icon"
+          );
+
+
+        if (icon) {
+
+          icon.textContent =
+            "👣";
+
+        }
+
+
+        const mainText =
+          Array.from(
+            space.children
+          ).find(
+            function (element) {
+
+              return (
+                element.tagName ===
+                "SPAN"
+              );
+
+            }
+          );
+
+
+        if (mainText) {
+
+          mainText.textContent =
+            "Story Path";
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+cleanBoardQuestions();
+
+
+/* =========================================
    QUESTIONS
-========================= */
+========================================= */
 
 const questions = [
 
@@ -212,38 +294,10 @@ const questions = [
     answers: [
       "She wants to feel like the special kids.",
       "She wants to skip class.",
-      "She wants to avoid her friends."
+      "She does not like school."
     ],
 
     correct: 0
-  },
-
-
-  {
-    question:
-      "Why are some students allowed to eat in the canteen?",
-
-    answers: [
-      "Their mothers are not home or they live too far away.",
-      "They have better grades.",
-      "They are older students."
-    ],
-
-    correct: 0
-  },
-
-
-  {
-    question:
-      "How long does Esperanza keep asking her mother?",
-
-    answers: [
-      "One day.",
-      "Three days.",
-      "One week."
-    ],
-
-    correct: 1
   },
 
 
@@ -263,26 +317,12 @@ const questions = [
 
   {
     question:
-      "Why does Esperanza have a rice sandwich?",
-
-    answers: [
-      "They do not have lunch meat.",
-      "Rice is her favorite food.",
-      "The school requires rice."
-    ],
-
-    correct: 0
-  },
-
-
-  {
-    question:
       "Who writes the letter for Esperanza?",
 
     answers: [
       "Her mother.",
-      "Nenny.",
-      "Her teacher."
+      "Her teacher.",
+      "Nenny."
     ],
 
     correct: 0
@@ -296,7 +336,7 @@ const questions = [
     answers: [
       "A nun.",
       "Her mother.",
-      "Gloria."
+      "Her teacher."
     ],
 
     correct: 0
@@ -310,7 +350,7 @@ const questions = [
     answers: [
       "Back home.",
       "To Sister Superior.",
-      "To her classroom."
+      "To the playground."
     ],
 
     correct: 1
@@ -319,29 +359,15 @@ const questions = [
 
   {
     question:
-      "What does Sister Superior ask Esperanza to identify?",
+      "What does Sister Superior ask Esperanza to point out?",
 
     answers: [
       "Her classroom.",
       "Her house.",
-      "Her mother."
+      "The canteen."
     ],
 
     correct: 1
-  },
-
-
-  {
-    question:
-      "About how far does Sister Superior say Esperanza lives from school?",
-
-    answers: [
-      "About three long blocks.",
-      "Ten miles.",
-      "One block."
-    ],
-
-    correct: 0
   },
 
 
@@ -352,7 +378,7 @@ const questions = [
     answers: [
       "She laughs.",
       "She cries.",
-      "She leaves."
+      "She gets angry."
     ],
 
     correct: 1
@@ -375,12 +401,40 @@ const questions = [
 
   {
     question:
-      "How long does Sister Superior allow Esperanza to stay in the canteen?",
+      "How long is Esperanza allowed to eat in the canteen?",
 
     answers: [
-      "Only for that day.",
-      "For the rest of the year.",
-      "For one week."
+      "Only that day.",
+      "Every day.",
+      "For one month."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "How does Esperanza feel about the canteen at the end?",
+
+    answers: [
+      "It is amazing.",
+      "It is nothing special.",
+      "It is her favorite place."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "Why does Esperanza nod at the wrong house?",
+
+    answers: [
+      "She feels embarrassed and pressured.",
+      "She forgot where she lives.",
+      "She wants to live there."
     ],
 
     correct: 0
@@ -398,43 +452,14 @@ const questions = [
     ],
 
     correct: 1
-  },
-
-
-  {
-    question:
-      "How does Esperanza describe the canteen at the end?",
-
-    answers: [
-      "Amazing.",
-      "Nothing special.",
-      "Very beautiful."
-    ],
-
-    correct: 1
-  },
-
-
-  {
-    question:
-      "Why does Esperanza nod at the wrong house?",
-
-    answers: [
-      "She feels pressured and embarrassed.",
-      "She forgot where she lives.",
-      "She wants to move there."
-    ],
-
-    correct: 0
   }
 
 ];
 
 
-
-/* =========================
-   EVENTS
-========================= */
+/* =========================================
+   SPECIAL EVENTS
+========================================= */
 
 const events = {
 
@@ -446,7 +471,7 @@ const events = {
       "Rice Sandwich",
 
     text:
-      "Your lunch is ready. You earn 1 Star!",
+      "Your lunch is ready! You earn 1 Star.",
 
     stars: 1
 
@@ -461,7 +486,7 @@ const events = {
       "Mother's Letter",
 
     text:
-      "Your mother writes a note for the school. Move forward 1 extra space!",
+      "Your mother wrote the letter! Move forward 1 extra space.",
 
     move: 1
 
@@ -476,9 +501,9 @@ const events = {
       "The Nun",
 
     text:
-      "The nun stops you before the canteen. Move back 1 space.",
+      "The nun stops Esperanza. Lose 1 Heart.",
 
-    move: -1
+    damage: 1
 
   },
 
@@ -488,12 +513,14 @@ const events = {
     icon: "😢",
 
     title:
-      "Embarrassed",
+      "Crying",
 
     text:
-      "Esperanza feels embarrassed and begins to cry. You lose your next roll.",
+      "Esperanza feels embarrassed. Lose 1 Star and reset your Streak.",
 
-    skip: 1
+    loseStars: 1,
+
+    resetStreak: true
 
   },
 
@@ -506,7 +533,7 @@ const events = {
       "Kleenex",
 
     text:
-      "You get a Kleenex. Recover 1 Heart!",
+      "Esperanza feels a little better. Recover 1 Heart.",
 
     heal: 1
 
@@ -521,19 +548,20 @@ const events = {
       "Permission Granted",
 
     text:
-      "Sister Superior lets you stay for today. You earn 2 Stars!",
+      "You may eat in the canteen today! Earn 2 Stars and move forward 1 space.",
 
-    stars: 2
+    stars: 2,
+
+    move: 1
 
   }
 
 };
 
 
-
-/* =========================
-   CHECKPOINT STORIES
-========================= */
+/* =========================================
+   CHECKPOINT STORY
+========================================= */
 
 const checkpointStories = {
 
@@ -548,7 +576,7 @@ const checkpointStories = {
       "The School",
 
     text:
-      "Esperanza arrives at school carrying her mother's letter and her rice sandwich."
+      "Esperanza arrives at school with her rice sandwich and her mother's letter."
 
   },
 
@@ -564,7 +592,7 @@ const checkpointStories = {
       "Sister Superior",
 
     text:
-      "The nun sends Esperanza upstairs. Sister Superior reads the letter and asks where Esperanza lives."
+      "Esperanza is sent upstairs to speak with Sister Superior."
 
   },
 
@@ -580,17 +608,16 @@ const checkpointStories = {
       "The Canteen",
 
     text:
-      "After an uncomfortable meeting, Esperanza is allowed to stay in the canteen for today."
+      "Esperanza finally receives permission to stay in the canteen for today."
 
   }
 
 };
 
 
-
-/* =========================
-   START
-========================= */
+/* =========================================
+   START GAME
+========================================= */
 
 startButton.addEventListener(
   "click",
@@ -639,26 +666,12 @@ function startGame() {
 
   updateUI();
 
-
-  setTimeout(
-    function () {
-
-      spaces[0].scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-
-    },
-    150
-  );
-
 }
 
 
-
-/* =========================
+/* =========================================
    RESET
-========================= */
+========================================= */
 
 function resetState() {
 
@@ -677,8 +690,6 @@ function resetState() {
   state.answered = 0;
 
   state.rolls = 0;
-
-  state.skipTurns = 0;
 
   state.busy = false;
 
@@ -734,7 +745,6 @@ function resetState() {
     "";
 
 
-
   rollButton.disabled =
     false;
 
@@ -749,10 +759,9 @@ function resetState() {
 }
 
 
-
-/* =========================
+/* =========================================
    PLAYER TOKEN
-========================= */
+========================================= */
 
 function createPlayerToken() {
 
@@ -781,10 +790,9 @@ function createPlayerToken() {
 }
 
 
-
-/* =========================
+/* =========================================
    UI
-========================= */
+========================================= */
 
 function updateUI() {
 
@@ -903,10 +911,9 @@ function getChapterName(position) {
 }
 
 
-
-/* =========================
+/* =========================================
    DICE
-========================= */
+========================================= */
 
 rollButton.addEventListener(
   "click",
@@ -920,49 +927,6 @@ function rollDice() {
     state.busy ||
     state.gameOver
   ) {
-
-    return;
-  }
-
-
-  /* SKIP TURN */
-
-  if (
-    state.skipTurns > 0
-  ) {
-
-    state.busy = true;
-
-    rollButton.disabled =
-      true;
-
-
-    state.skipTurns--;
-
-
-    diceResult.textContent =
-      "😢 You lose this roll.";
-
-
-    playLowTone();
-
-
-    setTimeout(
-      function () {
-
-        state.busy = false;
-
-        rollButton.disabled =
-          false;
-
-
-        diceResult.textContent =
-          "You can roll again!";
-
-      },
-      1000
-    );
-
 
     return;
   }
@@ -1051,10 +1015,10 @@ function rollDice() {
 }
 
 
-
-/* 1 = 40%
-   2 = 40%
-   3 = 20%
+/*
+1 = 40%
+2 = 40%
+3 = 20%
 */
 
 function weightedRoll() {
@@ -1086,10 +1050,9 @@ function weightedRoll() {
 }
 
 
-
-/* =========================
-   TARGET / CHECKPOINT
-========================= */
+/* =========================================
+   CHECKPOINT TARGET
+========================================= */
 
 function getTargetPosition(
   steps
@@ -1131,10 +1094,9 @@ function getTargetPosition(
 }
 
 
-
-/* =========================
-   MOVE
-========================= */
+/* =========================================
+   MOVE PLAYER
+========================================= */
 
 async function movePlayer(
   steps
@@ -1150,7 +1112,7 @@ async function movePlayer(
     state.position < target
   ) {
 
-    await wait(260);
+    await wait(250);
 
 
     state.position++;
@@ -1172,17 +1134,6 @@ async function movePlayer(
 
     updateUI();
 
-
-    spaces[
-      state.position
-    ].scrollIntoView({
-
-      behavior: "smooth",
-
-      block: "center"
-
-    });
-
   }
 
 
@@ -1194,10 +1145,9 @@ async function movePlayer(
 }
 
 
-
-/* =========================
+/* =========================================
    RESOLVE SPACE
-========================= */
+========================================= */
 
 function resolveSpace() {
 
@@ -1275,10 +1225,9 @@ function resolveSpace() {
 }
 
 
-
-/* =========================
+/* =========================================
    CHECKPOINT
-========================= */
+========================================= */
 
 function showCheckpoint(
   position
@@ -1345,10 +1294,9 @@ function showCheckpoint(
 }
 
 
-
-/* =========================
+/* =========================================
    QUESTION DECK
-========================= */
+========================================= */
 
 function nextQuestion() {
 
@@ -1402,10 +1350,9 @@ function shuffle(array) {
 }
 
 
-
-/* =========================
-   QUESTION
-========================= */
+/* =========================================
+   SHOW QUESTION
+========================================= */
 
 function showQuestion(
   challenge = false
@@ -1423,8 +1370,8 @@ function showQuestion(
 
   questionBadge.textContent =
     challenge
-      ? "⚡ CHALLENGE QUESTION · 2 STARS"
-      : "QUESTION · 1 STAR";
+      ? "⚡ CHALLENGE · +2 STARS"
+      : "QUESTION · +1 STAR";
 
 
   questionText.textContent =
@@ -1435,8 +1382,7 @@ function showQuestion(
     "";
 
 
-  questionFeedback
-    .textContent =
+  questionFeedback.textContent =
     "";
 
 
@@ -1488,10 +1434,9 @@ function showQuestion(
       );
 
 
-      answerOptions
-        .appendChild(
-          button
-        );
+      answerOptions.appendChild(
+        button
+      );
 
     }
   );
@@ -1499,10 +1444,9 @@ function showQuestion(
 }
 
 
-
-/* =========================
-   ANSWER
-========================= */
+/* =========================================
+   ANSWER QUESTION
+========================================= */
 
 async function answerQuestion(
   button,
@@ -1521,7 +1465,8 @@ async function answerQuestion(
   buttons.forEach(
     function (item) {
 
-      item.disabled = true;
+      item.disabled =
+        true;
 
     }
   );
@@ -1529,6 +1474,8 @@ async function answerQuestion(
 
   state.answered++;
 
+
+  /* CORRECT */
 
   if (
     selectedIndex ===
@@ -1557,59 +1504,71 @@ async function answerQuestion(
     );
 
 
-    questionFeedback
-      .textContent =
+    questionFeedback.textContent =
       reward === 2
-        ? "⚡ Correct! +2 Stars"
-        : "✅ Correct! +1 Star";
+        ? "⚡ Correct! +2 Stars!"
+        : "✅ Correct! +1 Star!";
 
 
     playCorrectSound();
 
-  }
 
-  else {
-
-    state.hearts =
-      Math.max(
-        0,
-        state.hearts - 1
-      );
+    updateUI();
 
 
-    state.streak = 0;
-
-
-    button.classList.add(
-      "wrong"
+    await wait(
+      1100
     );
 
 
-    buttons[
-      question.correct
-    ].classList.add(
-      "correct"
+    closeModal(
+      questionModal
     );
 
 
-    questionFeedback
-      .textContent =
-      "❌ Correct answer: " +
-      question.answers[
-        question.correct
-      ];
+    finishAction();
 
 
-    playWrongSound();
-
+    return;
   }
+
+
+  /* WRONG = LOSE HEART */
+
+  state.hearts =
+    Math.max(
+      0,
+      state.hearts - 1
+    );
+
+
+  state.streak = 0;
+
+
+  button.classList.add(
+    "wrong"
+  );
+
+
+  buttons[
+    question.correct
+  ].classList.add(
+    "correct"
+  );
+
+
+  questionFeedback.textContent =
+    "❌ Wrong! -1 Heart";
+
+
+  playWrongSound();
 
 
   updateUI();
 
 
   await wait(
-    1250
+    1200
   );
 
 
@@ -1623,10 +1582,9 @@ async function answerQuestion(
 }
 
 
-
-/* =========================
+/* =========================================
    SPECIAL EVENT
-========================= */
+========================================= */
 
 function showSpecialEvent(
   eventKey
@@ -1645,7 +1603,7 @@ function showSpecialEvent(
 
 
   eventLabel.textContent =
-    "SPECIAL EVENT";
+    "⚡ SPECIAL EVENT";
 
 
   eventIcon.textContent =
@@ -1661,7 +1619,7 @@ function showSpecialEvent(
 
 
   eventContinue.textContent =
-    "CONTINUE";
+    "APPLY EFFECT";
 
 
   openModal(
@@ -1684,6 +1642,12 @@ function showSpecialEvent(
       );
 
 
+      let resultMessage =
+        "";
+
+
+      /* ADD STARS */
+
       if (
         event.stars
       ) {
@@ -1691,12 +1655,93 @@ function showSpecialEvent(
         state.stars +=
           event.stars;
 
+
+        resultMessage =
+          "⭐ +" +
+          event.stars +
+          " Star" +
+          (
+            event.stars > 1
+              ? "s"
+              : ""
+          );
+
       }
 
+
+      /* LOSE STARS */
+
+      if (
+        event.loseStars
+      ) {
+
+        const before =
+          state.stars;
+
+
+        state.stars =
+          Math.max(
+            0,
+            state.stars -
+            event.loseStars
+          );
+
+
+        const lost =
+          before -
+          state.stars;
+
+
+        resultMessage =
+          lost > 0
+            ? "⭐ -" +
+              lost +
+              " Star"
+            : "🔥 Streak reset";
+
+      }
+
+
+      /* RESET STREAK */
+
+      if (
+        event.resetStreak
+      ) {
+
+        state.streak = 0;
+
+      }
+
+
+      /* DAMAGE */
+
+      if (
+        event.damage
+      ) {
+
+        state.hearts =
+          Math.max(
+            0,
+            state.hearts -
+            event.damage
+          );
+
+
+        resultMessage =
+          "❤️ -1 Heart";
+
+      }
+
+
+      /* HEAL */
 
       if (
         event.heal
       ) {
+
+        const before =
+          state.hearts;
+
 
         state.hearts =
           Math.min(
@@ -1705,15 +1750,11 @@ function showSpecialEvent(
             event.heal
           );
 
-      }
 
-
-      if (
-        event.skip
-      ) {
-
-        state.skipTurns +=
-          event.skip;
+        resultMessage =
+          state.hearts > before
+            ? "❤️ +1 Heart"
+            : "❤️ Hearts already full";
 
       }
 
@@ -1722,14 +1763,36 @@ function showSpecialEvent(
 
 
       if (
+        resultMessage
+      ) {
+
+        diceResult.textContent =
+          resultMessage;
+
+      }
+
+
+      /* EXTRA MOVEMENT */
+
+      if (
         event.move
       ) {
+
+        await wait(
+          350
+        );
+
 
         await moveBonus(
           event.move
         );
 
       }
+
+
+      await wait(
+        350
+      );
 
 
       finishAction();
@@ -1739,10 +1802,9 @@ function showSpecialEvent(
 }
 
 
-
-/* =========================
+/* =========================================
    BONUS MOVEMENT
-========================= */
+========================================= */
 
 async function moveBonus(
   amount
@@ -1765,7 +1827,9 @@ async function moveBonus(
       target
     ) {
 
-      await wait(250);
+      await wait(
+        260
+      );
 
 
       state.position++;
@@ -1791,6 +1855,7 @@ async function moveBonus(
 
   }
 
+
   else {
 
     const target =
@@ -1806,7 +1871,9 @@ async function moveBonus(
       target
     ) {
 
-      await wait(250);
+      await wait(
+        260
+      );
 
 
       state.position--;
@@ -1832,24 +1899,12 @@ async function moveBonus(
 
   }
 
-
-  spaces[
-    state.position
-  ].scrollIntoView({
-
-    behavior: "smooth",
-
-    block: "center"
-
-  });
-
 }
 
 
-
-/* =========================
+/* =========================================
    FINISH ACTION
-========================= */
+========================================= */
 
 function finishAction() {
 
@@ -1860,10 +1915,21 @@ function finishAction() {
     false;
 
 
-  diceResult.textContent =
-    state.skipTurns > 0
-      ? "⚠️ Your next roll will be skipped."
-      : "Ready to roll!";
+  setTimeout(
+    function () {
+
+      if (
+        !state.gameOver
+      ) {
+
+        diceResult.textContent =
+          "Ready to roll!";
+
+      }
+
+    },
+    500
+  );
 
 
   updateUI();
@@ -1871,10 +1937,9 @@ function finishAction() {
 }
 
 
-
-/* =========================
+/* =========================================
    VICTORY
-========================= */
+========================================= */
 
 function showVictory() {
 
@@ -1919,8 +1984,7 @@ function showVictory() {
     state.answered;
 
 
-  finalBestStreak
-    .textContent =
+  finalBestStreak.textContent =
     state.bestStreak;
 
 
@@ -1945,34 +2009,38 @@ function showVictory() {
 }
 
 
-
-/* =========================
+/* =========================================
    SCORE
-========================= */
+========================================= */
 
 function calculateScore() {
 
   const starScore =
-    state.stars * 500;
+    state.stars *
+    500;
 
 
   const correctScore =
-    state.correct * 650;
+    state.correct *
+    700;
 
 
   const streakScore =
-    state.bestStreak * 250;
+    state.bestStreak *
+    250;
 
 
   const heartScore =
-    state.hearts * 300;
+    state.hearts *
+    400;
 
 
   const rollBonus =
     Math.max(
       0,
       2500 -
-      state.rolls * 100
+      state.rolls *
+      100
     );
 
 
@@ -1990,7 +2058,7 @@ function calculateScore() {
 function getRank(score) {
 
   if (
-    score >= 8000
+    score >= 7500
   ) {
 
     return "🏆 Story Expert";
@@ -1999,7 +2067,7 @@ function getRank(score) {
 
 
   if (
-    score >= 6000
+    score >= 5500
   ) {
 
     return "⭐ Great Reader";
@@ -2008,7 +2076,7 @@ function getRank(score) {
 
 
   if (
-    score >= 4000
+    score >= 3500
   ) {
 
     return "📖 Story Explorer";
@@ -2021,10 +2089,9 @@ function getRank(score) {
 }
 
 
-
-/* =========================
+/* =========================================
    PLAY AGAIN
-========================= */
+========================================= */
 
 restartButton.addEventListener(
   "click",
@@ -2055,10 +2122,9 @@ restartButton.addEventListener(
 );
 
 
-
-/* =========================
-   SOUND TOGGLE
-========================= */
+/* =========================================
+   SOUND
+========================================= */
 
 soundStart.addEventListener(
   "click",
@@ -2117,10 +2183,9 @@ function updateSoundButtons() {
 updateSoundButtons();
 
 
-
-/* =========================
+/* =========================================
    AUDIO
-========================= */
+========================================= */
 
 let audioContext = null;
 
@@ -2233,11 +2298,12 @@ function playTone(
   oscillator.start();
 
 
-  gain.gain.exponentialRampToValueAtTime(
-    0.0001,
-    audioContext.currentTime +
-    duration
-  );
+  gain.gain
+    .exponentialRampToValueAtTime(
+      0.0001,
+      audioContext.currentTime +
+      duration
+    );
 
 
   oscillator.stop(
@@ -2264,7 +2330,8 @@ function playMoveSound() {
 
   playTone(
     430 +
-      state.position * 4,
+      state.position *
+      4,
     0.05,
     "sine",
     .022
@@ -2303,18 +2370,6 @@ function playWrongSound() {
     0.22,
     "sawtooth",
     .025
-  );
-
-}
-
-
-function playLowTone() {
-
-  playTone(
-    170,
-    0.15,
-    "sine",
-    .03
   );
 
 }
@@ -2379,10 +2434,9 @@ function playVictorySound() {
 }
 
 
-
-/* =========================
+/* =========================================
    CONFETTI
-========================= */
+========================================= */
 
 function launchConfetti() {
 
@@ -2465,10 +2519,9 @@ function launchConfetti() {
 }
 
 
-
-/* =========================
+/* =========================================
    MODALS
-========================= */
+========================================= */
 
 function openModal(modal) {
 
@@ -2488,10 +2541,9 @@ function closeModal(modal) {
 }
 
 
-
-/* =========================
+/* =========================================
    WAIT
-========================= */
+========================================= */
 
 function wait(milliseconds) {
 
