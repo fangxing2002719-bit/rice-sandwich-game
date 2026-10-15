@@ -140,7 +140,6 @@ const confettiLayer =
   document.getElementById("confettiLayer");
 
 
-
 /* =========================================
    STATE
 ========================================= */
@@ -152,23 +151,19 @@ const state = {
   position: 0,
 
   hearts: 3,
-
   maxHearts: 3,
 
   stars: 0,
 
   streak: 0,
-
   bestStreak: 0,
 
   correct: 0,
-
   answered: 0,
 
   rolls: 0,
 
   busy: false,
-
   gameOver: false,
 
   sound: true
@@ -200,7 +195,6 @@ const diceFaces = [
   "⚄",
   "⚅"
 ];
-
 
 
 /* =========================================
@@ -886,7 +880,6 @@ const questions = [
 ];
 
 
-
 /* =========================================
    SPECIAL EVENTS
 ========================================= */
@@ -989,7 +982,6 @@ const events = {
 };
 
 
-
 /* =========================================
    CHECKPOINT STORIES
 ========================================= */
@@ -1046,9 +1038,8 @@ const checkpointStories = {
 };
 
 
-
 /* =========================================
-   START
+   START GAME
 ========================================= */
 
 startButton.addEventListener(
@@ -1099,7 +1090,6 @@ function startGame() {
   updateUI();
 
 }
-
 
 
 /* =========================================
@@ -1192,9 +1182,8 @@ function resetState() {
 }
 
 
-
 /* =========================================
-   TOKEN
+   PLAYER TOKEN
 ========================================= */
 
 function createPlayerToken() {
@@ -1222,7 +1211,6 @@ function createPlayerToken() {
     );
 
 }
-
 
 
 /* =========================================
@@ -1354,7 +1342,6 @@ function getChapterName(
 }
 
 
-
 /* =========================================
    DICE
 ========================================= */
@@ -1463,12 +1450,8 @@ function rollDice() {
 }
 
 
-
 /*
-Actual movement is 1–3.
-
-The player is NOT told this.
-
+Actual movement:
 1 = 40%
 2 = 40%
 3 = 20%
@@ -1501,7 +1484,6 @@ function weightedRoll() {
   return 3;
 
 }
-
 
 
 /* =========================================
@@ -1548,7 +1530,6 @@ function getTargetPosition(
 }
 
 
-
 /* =========================================
    MOVE
 ========================================= */
@@ -1576,15 +1557,7 @@ async function movePlayer(
     state.position++;
 
 
-    spaces[
-      state.position
-    ]
-      .querySelector(
-        ".token-zone"
-      )
-      .appendChild(
-        playerToken
-      );
+    moveTokenToCurrentSpace();
 
 
     playMoveSound();
@@ -1604,6 +1577,29 @@ async function movePlayer(
 
 }
 
+
+function moveTokenToCurrentSpace() {
+
+  const tokenZone =
+    spaces[
+      state.position
+    ].querySelector(
+      ".token-zone"
+    );
+
+
+  if (
+    tokenZone &&
+    playerToken
+  ) {
+
+    tokenZone.appendChild(
+      playerToken
+    );
+
+  }
+
+}
 
 
 /* =========================================
@@ -1679,7 +1675,7 @@ function resolveSpace() {
   }
 
 
-  /* SPECIAL EVENT */
+  /* EVENT */
 
   if (
     type === "event"
@@ -1696,10 +1692,8 @@ function resolveSpace() {
 
 
   /*
-  NORMAL SPACE
-
-  35% chance to receive
-  a BONUS QUESTION.
+  NORMAL SPACE:
+  35% BONUS QUESTION
   */
 
   const chance =
@@ -1724,7 +1718,6 @@ function resolveSpace() {
   finishAction();
 
 }
-
 
 
 /* =========================================
@@ -1799,7 +1792,6 @@ function showCheckpoint(
 }
 
 
-
 /* =========================================
    QUESTION DECK
 ========================================= */
@@ -1858,9 +1850,8 @@ function shuffle(
 }
 
 
-
 /* =========================================
-   QUESTION
+   SHOW QUESTION
 ========================================= */
 
 function showQuestion(
@@ -1872,16 +1863,10 @@ function showQuestion(
     nextQuestion();
 
 
-  let reward = 1;
-
-
-  if (
+  const reward =
     challenge
-  ) {
-
-    reward = 2;
-
-  }
+      ? 2
+      : 1;
 
 
   if (
@@ -1980,9 +1965,8 @@ function showQuestion(
 }
 
 
-
 /* =========================================
-   ANSWER
+   ANSWER QUESTION
 ========================================= */
 
 async function answerQuestion(
@@ -2120,12 +2104,133 @@ async function answerQuestion(
   );
 
 
+  /*
+  HEARTS HIT ZERO
+  */
+
+  if (
+    state.hearts <= 0
+  ) {
+
+    showOutOfHearts();
+
+    return;
+
+  }
+
+
   finishAction(
     "❤️ -1 Heart. Ready to roll."
   );
 
 }
 
+
+/* =========================================
+   OUT OF HEARTS
+========================================= */
+
+function showOutOfHearts() {
+
+  state.busy =
+    true;
+
+
+  rollButton.disabled =
+    true;
+
+
+  eventLabel.textContent =
+    "💔 OUT OF HEARTS";
+
+
+  eventIcon.textContent =
+    "💔";
+
+
+  eventTitle.textContent =
+    "Esperanza Feels Overwhelmed";
+
+
+  eventText.textContent =
+    "You lost all your Hearts! Lose 2 Stars, reset your Streak, move back 2 spaces, and recover 1 Heart.";
+
+
+  eventContinue.textContent =
+    "RECOVER & CONTINUE";
+
+
+  openModal(
+    eventModal
+  );
+
+
+  playWrongSound();
+
+
+  eventContinue.onclick =
+    async function () {
+
+      eventContinue.onclick =
+        null;
+
+
+      closeModal(
+        eventModal
+      );
+
+
+      /*
+      PENALTY
+      */
+
+      state.stars =
+        Math.max(
+          0,
+          state.stars - 2
+        );
+
+
+      state.streak =
+        0;
+
+
+      /*
+      Give player one heart back
+      so the game can continue.
+      */
+
+      state.hearts =
+        1;
+
+
+      updateUI();
+
+
+      diceResult.textContent =
+        "💔 -2 Stars · Move back 2";
+
+
+      await wait(
+        350
+      );
+
+
+      await moveEffect(
+        -2
+      );
+
+
+      updateUI();
+
+
+      finishAction(
+        "❤️ Recovered 1 Heart. Ready to roll!"
+      );
+
+    };
+
+}
 
 
 /* =========================================
@@ -2195,7 +2300,7 @@ function showSpecialEvent(
         "Special Event complete!";
 
 
-      /* ADD STAR */
+      /* ADD STARS */
 
       if (
         event.stars
@@ -2220,13 +2325,13 @@ function showSpecialEvent(
       }
 
 
-      /* LOSE STAR */
+      /* LOSE STARS */
 
       if (
         event.loseStars
       ) {
 
-        const oldStars =
+        const before =
           state.stars;
 
 
@@ -2239,25 +2344,16 @@ function showSpecialEvent(
 
 
         const lost =
-          oldStars -
+          before -
           state.stars;
 
 
-        if (
+        resultMessage =
           lost > 0
-        ) {
-
-          resultMessage =
-            "⭐ -1 Star!";
-
-        }
-
-        else {
-
-          resultMessage =
-            "🔥 Streak reset!";
-
-        }
+            ? "⭐ -" +
+              lost +
+              " Star!"
+            : "🔥 Streak reset!";
 
 
         playWrongSound();
@@ -2306,7 +2402,7 @@ function showSpecialEvent(
         event.heal
       ) {
 
-        const oldHearts =
+        const before =
           state.hearts;
 
 
@@ -2319,8 +2415,7 @@ function showSpecialEvent(
 
 
         resultMessage =
-          state.hearts >
-          oldHearts
+          state.hearts > before
             ? "❤️ +1 Heart!"
             : "❤️ Hearts already full!";
 
@@ -2333,7 +2428,23 @@ function showSpecialEvent(
       updateUI();
 
 
-      /* MOVEMENT */
+      /*
+      CHECK HEARTS BEFORE
+      MOVEMENT / FINISH
+      */
+
+      if (
+        state.hearts <= 0
+      ) {
+
+        showOutOfHearts();
+
+        return;
+
+      }
+
+
+      /* EXTRA MOVEMENT */
 
       if (
         event.move
@@ -2349,17 +2460,13 @@ function showSpecialEvent(
         );
 
 
-        /*
-        If effect movement lands on
-        an important space,
-        activate it.
-        */
-
         const newSpace =
           spaces[
             state.position
           ];
 
+
+        /* FINISH */
 
         if (
           newSpace.dataset.type ===
@@ -2372,6 +2479,8 @@ function showSpecialEvent(
 
         }
 
+
+        /* CHECKPOINT */
 
         if (
           newSpace.dataset.type ===
@@ -2395,6 +2504,8 @@ function showSpecialEvent(
 
         }
 
+
+        /* QUESTION */
 
         if (
           newSpace.dataset.type ===
@@ -2431,7 +2542,6 @@ function showSpecialEvent(
     };
 
 }
-
 
 
 /* =========================================
@@ -2479,15 +2589,7 @@ async function moveEffect(
     }
 
 
-    spaces[
-      state.position
-    ]
-      .querySelector(
-        ".token-zone"
-      )
-      .appendChild(
-        playerToken
-      );
+    moveTokenToCurrentSpace();
 
 
     playMoveSound();
@@ -2498,7 +2600,6 @@ async function moveEffect(
   }
 
 }
-
 
 
 /* =========================================
@@ -2525,7 +2626,6 @@ function finishAction(
   updateUI();
 
 }
-
 
 
 /* =========================================
@@ -2601,7 +2701,6 @@ function showVictory() {
   launchConfetti();
 
 }
-
 
 
 /* =========================================
@@ -2686,7 +2785,6 @@ function getRank(
 }
 
 
-
 /* =========================================
    PLAY AGAIN
 ========================================= */
@@ -2718,7 +2816,6 @@ restartButton.addEventListener(
 
   }
 );
-
 
 
 /* =========================================
@@ -2780,7 +2877,6 @@ function updateSoundButtons() {
 
 
 updateSoundButtons();
-
 
 
 /* =========================================
@@ -3035,7 +3131,6 @@ function playVictorySound() {
 }
 
 
-
 /* =========================================
    CONFETTI
 ========================================= */
@@ -3121,7 +3216,6 @@ function launchConfetti() {
 }
 
 
-
 /* =========================================
    MODALS
 ========================================= */
@@ -3146,7 +3240,6 @@ function closeModal(
   );
 
 }
-
 
 
 /* =========================================
