@@ -1,3 +1,13 @@
+/* =========================================
+   A RICE SANDWICH
+   ESPERANZA'S JOURNEY
+========================================= */
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
 const startScreen =
   document.getElementById("startScreen");
 
@@ -16,8 +26,10 @@ const soundStart =
 const soundGame =
   document.getElementById("soundGame");
 
+
 const spaces =
   document.querySelectorAll(".space");
+
 
 const heartsValue =
   document.getElementById("heartsValue");
@@ -46,6 +58,7 @@ const displayName =
 const rollCount =
   document.getElementById("rollCount");
 
+
 const diceVisual =
   document.getElementById("diceVisual");
 
@@ -54,6 +67,7 @@ const diceResult =
 
 const rollButton =
   document.getElementById("rollButton");
+
 
 const questionModal =
   document.getElementById("questionModal");
@@ -69,6 +83,7 @@ const answerOptions =
 
 const questionFeedback =
   document.getElementById("questionFeedback");
+
 
 const eventModal =
   document.getElementById("eventModal");
@@ -87,6 +102,7 @@ const eventText =
 
 const eventContinue =
   document.getElementById("eventContinue");
+
 
 const victoryModal =
   document.getElementById("victoryModal");
@@ -126,10 +142,23 @@ const confettiLayer =
 
 
 /* =========================================
+   HIDE 1–3 DICE MESSAGE
+========================================= */
+
+const diceHint =
+  document.querySelector(".dice-hint");
+
+if (diceHint) {
+  diceHint.style.display = "none";
+}
+
+
+/* =========================================
    GAME STATE
 ========================================= */
 
 const state = {
+
   name: "Player",
 
   position: 0,
@@ -151,6 +180,7 @@ const state = {
   gameOver: false,
 
   sound: true
+
 };
 
 
@@ -171,11 +201,12 @@ const mandatoryCheckpoints = [
 
 
 /*
-Only FOUR question spaces:
-3  = Question 1
-9  = Question 2
-14 = Challenge
-24 = Final Challenge
+ONLY FOUR QUESTION SPACES PER GAME
+
+3  = Question
+9  = Question
+14 = Challenge Question
+24 = Final Question
 */
 
 const realQuestionSpaces =
@@ -198,7 +229,7 @@ const diceFaces = [
 
 
 /* =========================================
-   CHANGE EXTRA QUESTIONS INTO NORMAL SPACES
+   REMOVE EXTRA QUESTION SPACES
 ========================================= */
 
 function cleanBoardQuestions() {
@@ -214,7 +245,6 @@ function cleanBoardQuestions() {
         space.dataset.type =
           "normal";
 
-
         space.dataset.challenge =
           "false";
 
@@ -223,11 +253,9 @@ function cleanBoardQuestions() {
           "question-space"
         );
 
-
         space.classList.remove(
           "challenge-space"
         );
-
 
         space.classList.add(
           "normal-space"
@@ -282,10 +310,13 @@ cleanBoardQuestions();
 
 
 /* =========================================
-   QUESTIONS
+   QUESTION BANK
+   ALL QUESTIONS HAVE 4 ANSWERS
 ========================================= */
 
 const questions = [
+
+  /* 1 */
 
   {
     question:
@@ -293,13 +324,16 @@ const questions = [
 
     answers: [
       "She wants to feel like the special kids.",
-      "She wants to skip class.",
-      "She does not like school."
+      "She wants to skip her classes.",
+      "She does not like eating at home.",
+      "She wants to meet her teacher."
     ],
 
     correct: 0
   },
 
+
+  /* 2 */
 
   {
     question:
@@ -308,18 +342,39 @@ const questions = [
     answers: [
       "A ham sandwich.",
       "A rice sandwich.",
-      "A chicken sandwich."
+      "A chicken sandwich.",
+      "A cheese sandwich."
     ],
 
     correct: 1
   },
 
 
+  /* 3 */
+
   {
     question:
       "Who writes the letter for Esperanza?",
 
     answers: [
+      "Her mother.",
+      "Her teacher.",
+      "Nenny.",
+      "Sister Superior."
+    ],
+
+    correct: 0
+  },
+
+
+  /* 4 */
+
+  {
+    question:
+      "Who stops Esperanza before she enters the canteen?",
+
+    answers: [
+      "A nun.",
       "Her mother.",
       "Her teacher.",
       "Nenny."
@@ -329,19 +384,7 @@ const questions = [
   },
 
 
-  {
-    question:
-      "Who stops Esperanza before she enters the canteen?",
-
-    answers: [
-      "A nun.",
-      "Her mother.",
-      "Her teacher."
-    ],
-
-    correct: 0
-  },
-
+  /* 5 */
 
   {
     question:
@@ -350,12 +393,15 @@ const questions = [
     answers: [
       "Back home.",
       "To Sister Superior.",
-      "To the playground."
+      "To the playground.",
+      "To her classroom."
     ],
 
     correct: 1
   },
 
+
+  /* 6 */
 
   {
     question:
@@ -364,12 +410,15 @@ const questions = [
     answers: [
       "Her classroom.",
       "Her house.",
-      "The canteen."
+      "The canteen.",
+      "Her mother's car."
     ],
 
     correct: 1
   },
 
+
+  /* 7 */
 
   {
     question:
@@ -378,12 +427,15 @@ const questions = [
     answers: [
       "She laughs.",
       "She cries.",
-      "She gets angry."
+      "She becomes angry.",
+      "She walks away."
     ],
 
     correct: 1
   },
 
+
+  /* 8 */
 
   {
     question:
@@ -392,54 +444,66 @@ const questions = [
     answers: [
       "A Kleenex.",
       "A new sandwich.",
-      "A pencil."
+      "A pencil.",
+      "A glass of milk."
     ],
 
     correct: 0
   },
 
+
+  /* 9 */
 
   {
     question:
       "How long is Esperanza allowed to eat in the canteen?",
 
     answers: [
-      "Only that day.",
+      "Only for that day.",
       "Every day.",
-      "For one month."
+      "For one month.",
+      "For the rest of the school year."
     ],
 
     correct: 0
   },
 
+
+  /* 10 */
 
   {
     question:
       "How does Esperanza feel about the canteen at the end?",
 
     answers: [
-      "It is amazing.",
-      "It is nothing special.",
-      "It is her favorite place."
+      "She thinks it is amazing.",
+      "She realizes it is nothing special.",
+      "She wants to stay there all day.",
+      "She thinks it is better than home."
     ],
 
     correct: 1
   },
 
 
+  /* 11 */
+
   {
     question:
       "Why does Esperanza nod at the wrong house?",
 
     answers: [
-      "She feels embarrassed and pressured.",
-      "She forgot where she lives.",
-      "She wants to live there."
+      "She feels nervous and pressured.",
+      "She forgets where she lives.",
+      "She wants to live in that house.",
+      "She is playing a joke."
     ],
 
     correct: 0
   },
 
+
+  /* 12 */
 
   {
     question:
@@ -448,7 +512,110 @@ const questions = [
     answers: [
       "Hot.",
       "Cold.",
-      "Sweet."
+      "Sweet.",
+      "Spicy."
+    ],
+
+    correct: 1
+  },
+
+
+  /* NEW QUESTION FROM YOUR NOTES */
+
+  {
+    question:
+      "Why does Esperanza's mother refuse at first to let her eat in the canteen?",
+
+    answers: [
+      "She thinks Esperanza is too young.",
+      "She does not want the extra work of making special bag lunches.",
+      "She does not trust the teachers.",
+      "She wants Esperanza to buy lunch at school."
+    ],
+
+    correct: 1
+  },
+
+
+  /* NEW */
+
+  {
+    question:
+      "What happens when Esperanza first tries to eat in the canteen?",
+
+    answers: [
+      "The nun does not recognize her and sends her to Sister Superior.",
+      "She immediately sits down and eats.",
+      "Her mother comes to take her home.",
+      "Her friends give her permission to stay."
+    ],
+
+    correct: 0
+  },
+
+
+  /* NEW */
+
+  {
+    question:
+      "Why does Esperanza cry in Sister Superior's office?",
+
+    answers: [
+      "She loses her rice sandwich.",
+      "She is embarrassed and pressured by questions about her home.",
+      "She is angry because school is over.",
+      "She wants to go outside with her friends."
+    ],
+
+    correct: 1
+  },
+
+
+  /* NEW */
+
+  {
+    question:
+      "Why does Esperanza say that the wrong house is hers?",
+
+    answers: [
+      "She wants to buy the house.",
+      "She feels nervous and wants to escape the uncomfortable situation.",
+      "She cannot remember where her home is.",
+      "She wants Sister Superior to visit the house."
+    ],
+
+    correct: 1
+  },
+
+
+  /* NEW */
+
+  {
+    question:
+      "What does the rice sandwich symbolize in the story?",
+
+    answers: [
+      "Esperanza's family's limited money and her feeling different from others.",
+      "Esperanza's favorite meal.",
+      "Her mother's cooking skills.",
+      "A reward for doing well in school."
+    ],
+
+    correct: 0
+  },
+
+
+  /* NEW */
+
+  {
+    question:
+      "What does Esperanza realize after finally eating in the canteen?",
+
+    answers: [
+      "The canteen is much more exciting than she expected.",
+      "The canteen is not as special as she imagined.",
+      "She wants to eat there every day.",
+      "She prefers the canteen to her home."
     ],
 
     correct: 1
@@ -560,7 +727,7 @@ const events = {
 
 
 /* =========================================
-   CHECKPOINT STORY
+   CHECKPOINT STORIES
 ========================================= */
 
 const checkpointStories = {
@@ -791,7 +958,7 @@ function createPlayerToken() {
 
 
 /* =========================================
-   UI
+   UPDATE UI
 ========================================= */
 
 function updateUI() {
@@ -883,23 +1050,31 @@ function renderHearts() {
 }
 
 
-function getChapterName(position) {
+function getChapterName(
+  position
+) {
 
-  if (position <= 6) {
+  if (
+    position <= 6
+  ) {
 
     return "Chapter 1 · Home";
 
   }
 
 
-  if (position <= 12) {
+  if (
+    position <= 12
+  ) {
 
     return "Chapter 2 · School";
 
   }
 
 
-  if (position <= 20) {
+  if (
+    position <= 20
+  ) {
 
     return "Chapter 3 · Sister Superior";
 
@@ -912,7 +1087,7 @@ function getChapterName(position) {
 
 
 /* =========================================
-   DICE
+   ROLL DICE
 ========================================= */
 
 rollButton.addEventListener(
@@ -929,10 +1104,12 @@ function rollDice() {
   ) {
 
     return;
+
   }
 
 
   state.busy = true;
+
 
   rollButton.disabled =
     true;
@@ -958,6 +1135,11 @@ function rollDice() {
   const animation =
     setInterval(
       function () {
+
+        /*
+        Animation can visually show
+        all six dice faces.
+        */
 
         const fake =
           Math.floor(
@@ -1016,9 +1198,14 @@ function rollDice() {
 
 
 /*
+Actual movement:
+
 1 = 40%
 2 = 40%
 3 = 20%
+
+This probability is NOT displayed
+to the player.
 */
 
 function weightedRoll() {
@@ -1076,7 +1263,8 @@ function getTargetPosition(
       ) &&
       checkpoint >
         state.position &&
-      checkpoint <= target
+      checkpoint <=
+        target
     ) {
 
       target =
@@ -1109,10 +1297,13 @@ async function movePlayer(
 
 
   while (
-    state.position < target
+    state.position <
+    target
   ) {
 
-    await wait(250);
+    await wait(
+      250
+    );
 
 
     state.position++;
@@ -1137,7 +1328,9 @@ async function movePlayer(
   }
 
 
-  await wait(250);
+  await wait(
+    250
+  );
 
 
   resolveSpace();
@@ -1168,6 +1361,7 @@ function resolveSpace() {
     showVictory();
 
     return;
+
   }
 
 
@@ -1186,6 +1380,7 @@ function resolveSpace() {
 
 
     return;
+
   }
 
 
@@ -1195,7 +1390,8 @@ function resolveSpace() {
 
     const challenge =
       space.dataset
-        .challenge === "true";
+        .challenge ===
+      "true";
 
 
     showQuestion(
@@ -1204,6 +1400,7 @@ function resolveSpace() {
 
 
     return;
+
   }
 
 
@@ -1217,6 +1414,7 @@ function resolveSpace() {
 
 
     return;
+
   }
 
 
@@ -1226,7 +1424,7 @@ function resolveSpace() {
 
 
 /* =========================================
-   CHECKPOINT
+   CHECKPOINT STORY
 ========================================= */
 
 function showCheckpoint(
@@ -1244,6 +1442,7 @@ function showCheckpoint(
     finishAction();
 
     return;
+
   }
 
 
@@ -1320,7 +1519,9 @@ function nextQuestion() {
 }
 
 
-function shuffle(array) {
+function shuffle(
+  array
+) {
 
   for (
     let i =
@@ -1517,7 +1718,7 @@ async function answerQuestion(
 
 
     await wait(
-      1100
+      1150
     );
 
 
@@ -1526,14 +1727,19 @@ async function answerQuestion(
     );
 
 
-    finishAction();
+    finishAction(
+      reward === 2
+        ? "⚡ +2 Stars! Ready to roll."
+        : "⭐ +1 Star! Ready to roll."
+    );
 
 
     return;
+
   }
 
 
-  /* WRONG = LOSE HEART */
+  /* WRONG */
 
   state.hearts =
     Math.max(
@@ -1568,7 +1774,7 @@ async function answerQuestion(
 
 
   await wait(
-    1200
+    1300
   );
 
 
@@ -1577,7 +1783,9 @@ async function answerQuestion(
   );
 
 
-  finishAction();
+  finishAction(
+    "❤️ -1 Heart. Ready to roll."
+  );
 
 }
 
@@ -1591,7 +1799,9 @@ function showSpecialEvent(
 ) {
 
   const event =
-    events[eventKey];
+    events[
+      eventKey
+    ];
 
 
   if (!event) {
@@ -1599,6 +1809,7 @@ function showSpecialEvent(
     finishAction();
 
     return;
+
   }
 
 
@@ -1643,7 +1854,7 @@ function showSpecialEvent(
 
 
       let resultMessage =
-        "";
+        "Special Event complete!";
 
 
       /* ADD STARS */
@@ -1659,12 +1870,14 @@ function showSpecialEvent(
         resultMessage =
           "⭐ +" +
           event.stars +
-          " Star" +
           (
-            event.stars > 1
-              ? "s"
-              : ""
+            event.stars === 1
+              ? " Star!"
+              : " Stars!"
           );
+
+
+        playCorrectSound();
 
       }
 
@@ -1675,7 +1888,7 @@ function showSpecialEvent(
         event.loseStars
       ) {
 
-        const before =
+        const oldStars =
           state.stars;
 
 
@@ -1688,16 +1901,30 @@ function showSpecialEvent(
 
 
         const lost =
-          before -
+          oldStars -
           state.stars;
 
 
-        resultMessage =
+        if (
           lost > 0
-            ? "⭐ -" +
-              lost +
-              " Star"
-            : "🔥 Streak reset";
+        ) {
+
+          resultMessage =
+            "⭐ -" +
+            lost +
+            " Star!";
+
+        }
+
+        else {
+
+          resultMessage =
+            "🔥 Streak reset!";
+
+        }
+
+
+        playWrongSound();
 
       }
 
@@ -1708,7 +1935,8 @@ function showSpecialEvent(
         event.resetStreak
       ) {
 
-        state.streak = 0;
+        state.streak =
+          0;
 
       }
 
@@ -1728,7 +1956,10 @@ function showSpecialEvent(
 
 
         resultMessage =
-          "❤️ -1 Heart";
+          "❤️ -1 Heart!";
+
+
+        playWrongSound();
 
       }
 
@@ -1739,7 +1970,7 @@ function showSpecialEvent(
         event.heal
       ) {
 
-        const before =
+        const oldHearts =
           state.hearts;
 
 
@@ -1751,10 +1982,25 @@ function showSpecialEvent(
           );
 
 
-        resultMessage =
-          state.hearts > before
-            ? "❤️ +1 Heart"
-            : "❤️ Hearts already full";
+        if (
+          state.hearts >
+          oldHearts
+        ) {
+
+          resultMessage =
+            "❤️ +1 Heart!";
+
+        }
+
+        else {
+
+          resultMessage =
+            "❤️ Hearts already full!";
+
+        }
+
+
+        playCorrectSound();
 
       }
 
@@ -1762,21 +2008,15 @@ function showSpecialEvent(
       updateUI();
 
 
-      if (
-        resultMessage
-      ) {
-
-        diceResult.textContent =
-          resultMessage;
-
-      }
-
-
       /* EXTRA MOVEMENT */
 
       if (
         event.move
       ) {
+
+        resultMessage =
+          "👣 Move forward 1 extra space!";
+
 
         await wait(
           350
@@ -1790,12 +2030,48 @@ function showSpecialEvent(
       }
 
 
-      await wait(
-        350
+      updateUI();
+
+
+      /*
+      If bonus movement lands exactly
+      on a mandatory checkpoint,
+      show that checkpoint too.
+      */
+
+      const currentSpace =
+        spaces[
+          state.position
+        ];
+
+
+      if (
+        currentSpace.dataset.type ===
+          "checkpoint" &&
+        !checkpointsSeen.has(
+          state.position
+        )
+      ) {
+
+        checkpointsSeen.add(
+          state.position
+        );
+
+
+        showCheckpoint(
+          state.position
+        );
+
+
+        return;
+
+      }
+
+
+      finishAction(
+        resultMessage +
+        " Ready to roll."
       );
-
-
-      finishAction();
 
     };
 
@@ -1906,30 +2182,21 @@ async function moveBonus(
    FINISH ACTION
 ========================================= */
 
-function finishAction() {
+function finishAction(
+  message =
+    "Ready to roll!"
+) {
 
-  state.busy = false;
+  state.busy =
+    false;
 
 
   rollButton.disabled =
     false;
 
 
-  setTimeout(
-    function () {
-
-      if (
-        !state.gameOver
-      ) {
-
-        diceResult.textContent =
-          "Ready to roll!";
-
-      }
-
-    },
-    500
-  );
+  diceResult.textContent =
+    message;
 
 
   updateUI();
@@ -1943,9 +2210,12 @@ function finishAction() {
 
 function showVictory() {
 
-  state.gameOver = true;
+  state.gameOver =
+    true;
 
-  state.busy = true;
+
+  state.busy =
+    true;
 
 
   rollButton.disabled =
@@ -2010,7 +2280,7 @@ function showVictory() {
 
 
 /* =========================================
-   SCORE
+   FINAL SCORE
 ========================================= */
 
 function calculateScore() {
@@ -2055,7 +2325,9 @@ function calculateScore() {
 }
 
 
-function getRank(score) {
+function getRank(
+  score
+) {
 
   if (
     score >= 7500
@@ -2123,7 +2395,7 @@ restartButton.addEventListener(
 
 
 /* =========================================
-   SOUND
+   SOUND BUTTONS
 ========================================= */
 
 soundStart.addEventListener(
@@ -2187,7 +2459,8 @@ updateSoundButtons();
    AUDIO
 ========================================= */
 
-let audioContext = null;
+let audioContext =
+  null;
 
 
 function ensureAudio() {
@@ -2523,7 +2796,9 @@ function launchConfetti() {
    MODALS
 ========================================= */
 
-function openModal(modal) {
+function openModal(
+  modal
+) {
 
   modal.classList.add(
     "open"
@@ -2532,7 +2807,9 @@ function openModal(modal) {
 }
 
 
-function closeModal(modal) {
+function closeModal(
+  modal
+) {
 
   modal.classList.remove(
     "open"
@@ -2545,7 +2822,9 @@ function closeModal(modal) {
    WAIT
 ========================================= */
 
-function wait(milliseconds) {
+function wait(
+  milliseconds
+) {
 
   return new Promise(
     function (resolve) {
