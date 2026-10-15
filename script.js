@@ -26,7 +26,6 @@ const soundStart =
 const soundGame =
   document.getElementById("soundGame");
 
-
 const spaces =
   document.querySelectorAll(".space");
 
@@ -141,20 +140,9 @@ const confettiLayer =
   document.getElementById("confettiLayer");
 
 
-/* =========================================
-   HIDE 1–3 DICE MESSAGE
-========================================= */
-
-const diceHint =
-  document.querySelector(".dice-hint");
-
-if (diceHint) {
-  diceHint.style.display = "none";
-}
-
 
 /* =========================================
-   GAME STATE
+   STATE
 ========================================= */
 
 const state = {
@@ -164,19 +152,23 @@ const state = {
   position: 0,
 
   hearts: 3,
+
   maxHearts: 3,
 
   stars: 0,
 
   streak: 0,
+
   bestStreak: 0,
 
   correct: 0,
+
   answered: 0,
 
   rolls: 0,
 
   busy: false,
+
   gameOver: false,
 
   sound: true
@@ -200,24 +192,6 @@ const mandatoryCheckpoints = [
 ];
 
 
-/*
-ONLY FOUR QUESTION SPACES PER GAME
-
-3  = Question
-9  = Question
-14 = Challenge Question
-24 = Final Question
-*/
-
-const realQuestionSpaces =
-  new Set([
-    3,
-    9,
-    14,
-    24
-  ]);
-
-
 const diceFaces = [
   "⚀",
   "⚁",
@@ -228,95 +202,12 @@ const diceFaces = [
 ];
 
 
-/* =========================================
-   REMOVE EXTRA QUESTION SPACES
-========================================= */
-
-function cleanBoardQuestions() {
-
-  spaces.forEach(
-    function (space, index) {
-
-      if (
-        space.dataset.type === "question" &&
-        !realQuestionSpaces.has(index)
-      ) {
-
-        space.dataset.type =
-          "normal";
-
-        space.dataset.challenge =
-          "false";
-
-
-        space.classList.remove(
-          "question-space"
-        );
-
-        space.classList.remove(
-          "challenge-space"
-        );
-
-        space.classList.add(
-          "normal-space"
-        );
-
-
-        const icon =
-          space.querySelector(
-            ".space-icon"
-          );
-
-
-        if (icon) {
-
-          icon.textContent =
-            "👣";
-
-        }
-
-
-        const mainText =
-          Array.from(
-            space.children
-          ).find(
-            function (element) {
-
-              return (
-                element.tagName ===
-                "SPAN"
-              );
-
-            }
-          );
-
-
-        if (mainText) {
-
-          mainText.textContent =
-            "Story Path";
-
-        }
-
-      }
-
-    }
-  );
-
-}
-
-
-cleanBoardQuestions();
-
 
 /* =========================================
    QUESTION BANK
-   ALL QUESTIONS HAVE 4 ANSWERS
 ========================================= */
 
 const questions = [
-
-  /* 1 */
 
   {
     question:
@@ -324,7 +215,7 @@ const questions = [
 
     answers: [
       "She wants to feel like the special kids.",
-      "She wants to skip her classes.",
+      "She wants to skip class.",
       "She does not like eating at home.",
       "She wants to meet her teacher."
     ],
@@ -332,8 +223,6 @@ const questions = [
     correct: 0
   },
 
-
-  /* 2 */
 
   {
     question:
@@ -350,8 +239,6 @@ const questions = [
   },
 
 
-  /* 3 */
-
   {
     question:
       "Who writes the letter for Esperanza?",
@@ -366,8 +253,6 @@ const questions = [
     correct: 0
   },
 
-
-  /* 4 */
 
   {
     question:
@@ -384,8 +269,6 @@ const questions = [
   },
 
 
-  /* 5 */
-
   {
     question:
       "Where does the nun send Esperanza?",
@@ -400,8 +283,6 @@ const questions = [
     correct: 1
   },
 
-
-  /* 6 */
 
   {
     question:
@@ -418,8 +299,6 @@ const questions = [
   },
 
 
-  /* 7 */
-
   {
     question:
       "How does Esperanza react when Sister Superior questions her?",
@@ -434,8 +313,6 @@ const questions = [
     correct: 1
   },
 
-
-  /* 8 */
 
   {
     question:
@@ -452,8 +329,6 @@ const questions = [
   },
 
 
-  /* 9 */
-
   {
     question:
       "How long is Esperanza allowed to eat in the canteen?",
@@ -468,8 +343,6 @@ const questions = [
     correct: 0
   },
 
-
-  /* 10 */
 
   {
     question:
@@ -486,8 +359,6 @@ const questions = [
   },
 
 
-  /* 11 */
-
   {
     question:
       "Why does Esperanza nod at the wrong house?",
@@ -502,8 +373,6 @@ const questions = [
     correct: 0
   },
 
-
-  /* 12 */
 
   {
     question:
@@ -520,24 +389,20 @@ const questions = [
   },
 
 
-  /* NEW QUESTION FROM YOUR NOTES */
-
   {
     question:
       "Why does Esperanza's mother refuse at first to let her eat in the canteen?",
 
     answers: [
       "She thinks Esperanza is too young.",
-      "She does not want the extra work of making special bag lunches.",
-      "She does not trust the teachers.",
-      "She wants Esperanza to buy lunch at school."
+      "She does not want the extra work of preparing special bag lunches.",
+      "She does not trust the school.",
+      "She wants Esperanza to buy lunch."
     ],
 
     correct: 1
   },
 
-
-  /* NEW */
 
   {
     question:
@@ -545,33 +410,29 @@ const questions = [
 
     answers: [
       "The nun does not recognize her and sends her to Sister Superior.",
-      "She immediately sits down and eats.",
+      "She sits down and eats immediately.",
       "Her mother comes to take her home.",
-      "Her friends give her permission to stay."
+      "Her friends give her permission."
     ],
 
     correct: 0
   },
 
 
-  /* NEW */
-
   {
     question:
       "Why does Esperanza cry in Sister Superior's office?",
 
     answers: [
-      "She loses her rice sandwich.",
-      "She is embarrassed and pressured by questions about her home.",
+      "She loses her sandwich.",
+      "She feels embarrassed and pressured by questions about her home.",
       "She is angry because school is over.",
-      "She wants to go outside with her friends."
+      "She wants to see Nenny."
     ],
 
     correct: 1
   },
 
-
-  /* NEW */
 
   {
     question:
@@ -580,19 +441,17 @@ const questions = [
     answers: [
       "She wants to buy the house.",
       "She feels nervous and wants to escape the uncomfortable situation.",
-      "She cannot remember where her home is.",
-      "She wants Sister Superior to visit the house."
+      "She cannot remember where she lives.",
+      "She wants Sister Superior to visit it."
     ],
 
     correct: 1
   },
 
 
-  /* NEW */
-
   {
     question:
-      "What does the rice sandwich symbolize in the story?",
+      "What does the rice sandwich symbolize?",
 
     answers: [
       "Esperanza's family's limited money and her feeling different from others.",
@@ -605,23 +464,427 @@ const questions = [
   },
 
 
-  /* NEW */
-
   {
     question:
       "What does Esperanza realize after finally eating in the canteen?",
 
     answers: [
-      "The canteen is much more exciting than she expected.",
+      "The canteen is more exciting than she expected.",
       "The canteen is not as special as she imagined.",
       "She wants to eat there every day.",
-      "She prefers the canteen to her home."
+      "She wants to work in the canteen."
     ],
 
     correct: 1
+  },
+
+
+  {
+    question:
+      "Why are the 'special kids' allowed to eat in the canteen?",
+
+    answers: [
+      "Their mothers are not home or they live too far away.",
+      "They have the highest grades.",
+      "They are older students.",
+      "They pay extra money."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "What does Esperanza's mother say the children like to invent for her?",
+
+    answers: [
+      "More homework.",
+      "More work.",
+      "More school rules.",
+      "More games."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What does Esperanza's mother imagine she would have to do for bag lunches?",
+
+    answers: [
+      "Cook rice every morning.",
+      "Cut bread into little triangles and prepare different sandwiches.",
+      "Buy lunch from school.",
+      "Wake Esperanza up earlier."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "Why does Nenny not want to eat at school?",
+
+    answers: [
+      "She likes going home with Gloria.",
+      "She dislikes school food.",
+      "She is afraid of the nuns.",
+      "She does not eat lunch."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "What do Nenny and Gloria usually do at Gloria's house?",
+
+    answers: [
+      "Study together.",
+      "Watch cartoons.",
+      "Cook lunch.",
+      "Play basketball."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "Why do Kiki and Carlos like standing outside in the cold?",
+
+    answers: [
+      "They want to miss class.",
+      "They think suffering is good for them.",
+      "They are waiting for their mother.",
+      "They do not have a classroom."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What movie influences Kiki and Carlos's idea about suffering?",
+
+    answers: [
+      "300 Spartans.",
+      "Rocky.",
+      "Superman.",
+      "Star Wars."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "Why does Esperanza say she is 'no Spartan'?",
+
+    answers: [
+      "She does not like movies.",
+      "She says she is physically weak and gets dizzy easily.",
+      "She wants to stay inside.",
+      "She does not know Kiki and Carlos."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What does Esperanza say would happen if she ate lunch at school?",
+
+    answers: [
+      "There would be fewer dishes to wash.",
+      "Her mother would have more dishes.",
+      "She would miss class.",
+      "She would have to cook dinner."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "What time does Esperanza say she would finally come home?",
+
+    answers: [
+      "12 p.m.",
+      "1 p.m.",
+      "3 p.m.",
+      "5 p.m."
+    ],
+
+    correct: 2
+  },
+
+
+  {
+    question:
+      "How long does Esperanza keep asking her mother before she agrees?",
+
+    answers: [
+      "One day.",
+      "Two days.",
+      "Three days.",
+      "One week."
+    ],
+
+    correct: 2
+  },
+
+
+  {
+    question:
+      "Why is Esperanza's lunch a rice sandwich?",
+
+    answers: [
+      "Rice is her favorite food.",
+      "Her family does not have lunch meat.",
+      "The school requires rice.",
+      "Her mother forgot to buy bread."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "Who knows all the canteen kids by heart?",
+
+    answers: [
+      "Esperanza's teacher.",
+      "The nun.",
+      "Esperanza's mother.",
+      "Nenny."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What does Esperanza do when the nun asks who sent her?",
+
+    answers: [
+      "She argues.",
+      "She silently holds out the letter.",
+      "She runs away.",
+      "She calls her mother."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "Why does Esperanza have to see Sister Superior?",
+
+    answers: [
+      "The nun says Sister Superior must approve the letter.",
+      "Esperanza is late for class.",
+      "Her teacher wants to punish her.",
+      "She lost her sandwich."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "What happens to the two children waiting before Esperanza?",
+
+    answers: [
+      "They receive awards.",
+      "They are hollered at.",
+      "They are sent home.",
+      "They eat lunch."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What is under the glass on Sister Superior's desk?",
+
+    answers: [
+      "Family photographs.",
+      "Holy pictures.",
+      "Student grades.",
+      "Lunch menus."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What reason does Esperanza's mother give in the letter?",
+
+    answers: [
+      "Esperanza lives too far away and gets tired.",
+      "Esperanza has a job.",
+      "Esperanza dislikes eating at home.",
+      "Esperanza needs more study time."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "How does Esperanza's mother describe her in the letter?",
+
+    answers: [
+      "Very tall.",
+      "Very skinny.",
+      "Very strong.",
+      "Very loud."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "About how far does Sister Superior say Esperanza lives from school?",
+
+    answers: [
+      "About three long blocks.",
+      "Ten blocks.",
+      "One mile.",
+      "Across the street."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "What kind of buildings does Sister Superior point toward?",
+
+    answers: [
+      "Large new houses.",
+      "A row of ugly three-flats.",
+      "School apartments.",
+      "Expensive hotels."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What does Sister Superior do after Esperanza begins crying?",
+
+    answers: [
+      "She sends Esperanza home immediately.",
+      "She feels sorry and lets Esperanza stay for the day.",
+      "She calls Esperanza's mother.",
+      "She takes away the sandwich."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "How is the bread when Esperanza finally eats her sandwich?",
+
+    answers: [
+      "Fresh.",
+      "Greasy.",
+      "Burned.",
+      "Frozen."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "What are the other boys and girls doing while Esperanza eats?",
+
+    answers: [
+      "They ignore her.",
+      "They watch her while she cries.",
+      "They leave the canteen.",
+      "They give her food."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "Which theme is connected to Esperanza wanting to eat in the canteen?",
+
+    answers: [
+      "Belonging and wanting to fit in.",
+      "Winning a competition.",
+      "Learning how to cook.",
+      "Becoming a teacher."
+    ],
+
+    correct: 0
+  },
+
+
+  {
+    question:
+      "What does the rice sandwich reveal about Esperanza's family?",
+
+    answers: [
+      "They are wealthy.",
+      "They sometimes have limited money and food choices.",
+      "They own a restaurant.",
+      "They only eat rice."
+    ],
+
+    correct: 1
+  },
+
+
+  {
+    question:
+      "Why is the ending ironic?",
+
+    answers: [
+      "Esperanza works hard to enter the canteen, but it turns out to be nothing special.",
+      "Esperanza never reaches school.",
+      "The canteen becomes her home.",
+      "Sister Superior eats her sandwich."
+    ],
+
+    correct: 0
   }
 
 ];
+
 
 
 /* =========================================
@@ -638,7 +901,7 @@ const events = {
       "Rice Sandwich",
 
     text:
-      "Your lunch is ready! You earn 1 Star.",
+      "Your lunch is ready! Earn 1 Star.",
 
     stars: 1
 
@@ -700,7 +963,7 @@ const events = {
       "Kleenex",
 
     text:
-      "Esperanza feels a little better. Recover 1 Heart.",
+      "Esperanza feels better. Recover 1 Heart.",
 
     heal: 1
 
@@ -715,7 +978,7 @@ const events = {
       "Permission Granted",
 
     text:
-      "You may eat in the canteen today! Earn 2 Stars and move forward 1 space.",
+      "You may stay in the canteen today! Earn 2 Stars and move forward 1 space.",
 
     stars: 2,
 
@@ -724,6 +987,7 @@ const events = {
   }
 
 };
+
 
 
 /* =========================================
@@ -782,8 +1046,9 @@ const checkpointStories = {
 };
 
 
+
 /* =========================================
-   START GAME
+   START
 ========================================= */
 
 startButton.addEventListener(
@@ -834,6 +1099,7 @@ function startGame() {
   updateUI();
 
 }
+
 
 
 /* =========================================
@@ -926,8 +1192,9 @@ function resetState() {
 }
 
 
+
 /* =========================================
-   PLAYER TOKEN
+   TOKEN
 ========================================= */
 
 function createPlayerToken() {
@@ -957,8 +1224,9 @@ function createPlayerToken() {
 }
 
 
+
 /* =========================================
-   UPDATE UI
+   UI
 ========================================= */
 
 function updateUI() {
@@ -1086,8 +1354,9 @@ function getChapterName(
 }
 
 
+
 /* =========================================
-   ROLL DICE
+   DICE
 ========================================= */
 
 rollButton.addEventListener(
@@ -1108,7 +1377,8 @@ function rollDice() {
   }
 
 
-  state.busy = true;
+  state.busy =
+    true;
 
 
   rollButton.disabled =
@@ -1129,17 +1399,13 @@ function rollDice() {
   playRollSound();
 
 
-  let animationCount = 0;
+  let animationCount =
+    0;
 
 
   const animation =
     setInterval(
       function () {
-
-        /*
-        Animation can visually show
-        all six dice faces.
-        */
 
         const fake =
           Math.floor(
@@ -1155,7 +1421,7 @@ function rollDice() {
 
 
         if (
-          animationCount >= 10
+          animationCount >= 11
         ) {
 
           clearInterval(
@@ -1197,15 +1463,15 @@ function rollDice() {
 }
 
 
+
 /*
-Actual movement:
+Actual movement is 1–3.
+
+The player is NOT told this.
 
 1 = 40%
 2 = 40%
 3 = 20%
-
-This probability is NOT displayed
-to the player.
 */
 
 function weightedRoll() {
@@ -1237,6 +1503,7 @@ function weightedRoll() {
 }
 
 
+
 /* =========================================
    CHECKPOINT TARGET
 ========================================= */
@@ -1263,8 +1530,7 @@ function getTargetPosition(
       ) &&
       checkpoint >
         state.position &&
-      checkpoint <=
-        target
+      checkpoint <= target
     ) {
 
       target =
@@ -1282,8 +1548,9 @@ function getTargetPosition(
 }
 
 
+
 /* =========================================
-   MOVE PLAYER
+   MOVE
 ========================================= */
 
 async function movePlayer(
@@ -1338,6 +1605,7 @@ async function movePlayer(
 }
 
 
+
 /* =========================================
    RESOLVE SPACE
 ========================================= */
@@ -1354,6 +1622,8 @@ function resolveSpace() {
     space.dataset.type;
 
 
+  /* FINISH */
+
   if (
     type === "finish"
   ) {
@@ -1364,6 +1634,8 @@ function resolveSpace() {
 
   }
 
+
+  /* CHECKPOINT */
 
   if (
     type === "checkpoint"
@@ -1384,6 +1656,8 @@ function resolveSpace() {
   }
 
 
+  /* QUESTION */
+
   if (
     type === "question"
   ) {
@@ -1395,7 +1669,8 @@ function resolveSpace() {
 
 
     showQuestion(
-      challenge
+      challenge,
+      false
     );
 
 
@@ -1403,6 +1678,8 @@ function resolveSpace() {
 
   }
 
+
+  /* SPECIAL EVENT */
 
   if (
     type === "event"
@@ -1418,13 +1695,40 @@ function resolveSpace() {
   }
 
 
+  /*
+  NORMAL SPACE
+
+  35% chance to receive
+  a BONUS QUESTION.
+  */
+
+  const chance =
+    Math.random();
+
+
+  if (
+    chance < 0.35
+  ) {
+
+    showQuestion(
+      false,
+      true
+    );
+
+
+    return;
+
+  }
+
+
   finishAction();
 
 }
 
 
+
 /* =========================================
-   CHECKPOINT STORY
+   CHECKPOINT
 ========================================= */
 
 function showCheckpoint(
@@ -1486,11 +1790,14 @@ function showCheckpoint(
       );
 
 
-      finishAction();
+      finishAction(
+        "Checkpoint complete. Ready to roll!"
+      );
 
     };
 
 }
+
 
 
 /* =========================================
@@ -1551,28 +1858,56 @@ function shuffle(
 }
 
 
+
 /* =========================================
-   SHOW QUESTION
+   QUESTION
 ========================================= */
 
 function showQuestion(
-  challenge = false
+  challenge = false,
+  bonus = false
 ) {
 
   const question =
     nextQuestion();
 
 
-  const reward =
-    challenge
-      ? 2
-      : 1;
+  let reward = 1;
 
 
-  questionBadge.textContent =
+  if (
     challenge
-      ? "⚡ CHALLENGE · +2 STARS"
-      : "QUESTION · +1 STAR";
+  ) {
+
+    reward = 2;
+
+  }
+
+
+  if (
+    challenge
+  ) {
+
+    questionBadge.textContent =
+      "⚡ CHALLENGE · +2 STARS";
+
+  }
+
+  else if (
+    bonus
+  ) {
+
+    questionBadge.textContent =
+      "🎲 BONUS QUESTION · +1 STAR";
+
+  }
+
+  else {
+
+    questionBadge.textContent =
+      "QUESTION · +1 STAR";
+
+  }
 
 
   questionText.textContent =
@@ -1645,8 +1980,9 @@ function showQuestion(
 }
 
 
+
 /* =========================================
-   ANSWER QUESTION
+   ANSWER
 ========================================= */
 
 async function answerQuestion(
@@ -1748,7 +2084,8 @@ async function answerQuestion(
     );
 
 
-  state.streak = 0;
+  state.streak =
+    0;
 
 
   button.classList.add(
@@ -1788,6 +2125,7 @@ async function answerQuestion(
   );
 
 }
+
 
 
 /* =========================================
@@ -1857,7 +2195,7 @@ function showSpecialEvent(
         "Special Event complete!";
 
 
-      /* ADD STARS */
+      /* ADD STAR */
 
       if (
         event.stars
@@ -1882,7 +2220,7 @@ function showSpecialEvent(
       }
 
 
-      /* LOSE STARS */
+      /* LOSE STAR */
 
       if (
         event.loseStars
@@ -1910,9 +2248,7 @@ function showSpecialEvent(
         ) {
 
           resultMessage =
-            "⭐ -" +
-            lost +
-            " Star!";
+            "⭐ -1 Star!";
 
         }
 
@@ -1982,22 +2318,11 @@ function showSpecialEvent(
           );
 
 
-        if (
+        resultMessage =
           state.hearts >
           oldHearts
-        ) {
-
-          resultMessage =
-            "❤️ +1 Heart!";
-
-        }
-
-        else {
-
-          resultMessage =
-            "❤️ Hearts already full!";
-
-        }
+            ? "❤️ +1 Heart!"
+            : "❤️ Hearts already full!";
 
 
         playCorrectSound();
@@ -2008,64 +2333,94 @@ function showSpecialEvent(
       updateUI();
 
 
-      /* EXTRA MOVEMENT */
+      /* MOVEMENT */
 
       if (
         event.move
       ) {
-
-        resultMessage =
-          "👣 Move forward 1 extra space!";
-
 
         await wait(
           350
         );
 
 
-        await moveBonus(
+        await moveEffect(
           event.move
         );
+
+
+        /*
+        If effect movement lands on
+        an important space,
+        activate it.
+        */
+
+        const newSpace =
+          spaces[
+            state.position
+          ];
+
+
+        if (
+          newSpace.dataset.type ===
+          "finish"
+        ) {
+
+          showVictory();
+
+          return;
+
+        }
+
+
+        if (
+          newSpace.dataset.type ===
+          "checkpoint" &&
+          !checkpointsSeen.has(
+            state.position
+          )
+        ) {
+
+          checkpointsSeen.add(
+            state.position
+          );
+
+
+          showCheckpoint(
+            state.position
+          );
+
+
+          return;
+
+        }
+
+
+        if (
+          newSpace.dataset.type ===
+          "question"
+        ) {
+
+          const challenge =
+            newSpace.dataset
+              .challenge ===
+            "true";
+
+
+          showQuestion(
+            challenge,
+            false
+          );
+
+
+          return;
+
+        }
 
       }
 
 
       updateUI();
-
-
-      /*
-      If bonus movement lands exactly
-      on a mandatory checkpoint,
-      show that checkpoint too.
-      */
-
-      const currentSpace =
-        spaces[
-          state.position
-        ];
-
-
-      if (
-        currentSpace.dataset.type ===
-          "checkpoint" &&
-        !checkpointsSeen.has(
-          state.position
-        )
-      ) {
-
-        checkpointsSeen.add(
-          state.position
-        );
-
-
-        showCheckpoint(
-          state.position
-        );
-
-
-        return;
-
-      }
 
 
       finishAction(
@@ -2078,104 +2433,72 @@ function showSpecialEvent(
 }
 
 
+
 /* =========================================
-   BONUS MOVEMENT
+   EFFECT MOVEMENT
 ========================================= */
 
-async function moveBonus(
+async function moveEffect(
   amount
 ) {
 
-  if (
-    amount > 0
+  const target =
+    Math.max(
+      0,
+      Math.min(
+        spaces.length - 1,
+        state.position +
+        amount
+      )
+    );
+
+
+  while (
+    state.position !==
+    target
   ) {
 
-    const target =
-      Math.min(
-        state.position +
-        amount,
-        spaces.length - 1
-      );
+    await wait(
+      260
+    );
 
 
-    while (
-      state.position <
-      target
+    if (
+      target >
+      state.position
     ) {
-
-      await wait(
-        260
-      );
-
 
       state.position++;
 
-
-      spaces[
-        state.position
-      ]
-        .querySelector(
-          ".token-zone"
-        )
-        .appendChild(
-          playerToken
-        );
-
-
-      playMoveSound();
-
-
-      updateUI();
-
     }
 
-  }
-
-
-  else {
-
-    const target =
-      Math.max(
-        0,
-        state.position +
-        amount
-      );
-
-
-    while (
-      state.position >
-      target
-    ) {
-
-      await wait(
-        260
-      );
-
+    else {
 
       state.position--;
 
-
-      spaces[
-        state.position
-      ]
-        .querySelector(
-          ".token-zone"
-        )
-        .appendChild(
-          playerToken
-        );
-
-
-      playMoveSound();
-
-
-      updateUI();
-
     }
+
+
+    spaces[
+      state.position
+    ]
+      .querySelector(
+        ".token-zone"
+      )
+      .appendChild(
+        playerToken
+      );
+
+
+    playMoveSound();
+
+
+    updateUI();
 
   }
 
 }
+
 
 
 /* =========================================
@@ -2202,6 +2525,7 @@ function finishAction(
   updateUI();
 
 }
+
 
 
 /* =========================================
@@ -2279,20 +2603,21 @@ function showVictory() {
 }
 
 
+
 /* =========================================
-   FINAL SCORE
+   SCORE
 ========================================= */
 
 function calculateScore() {
 
   const starScore =
     state.stars *
-    500;
+    450;
 
 
   const correctScore =
     state.correct *
-    700;
+    550;
 
 
   const streakScore =
@@ -2330,7 +2655,7 @@ function getRank(
 ) {
 
   if (
-    score >= 7500
+    score >= 9000
   ) {
 
     return "🏆 Story Expert";
@@ -2339,7 +2664,7 @@ function getRank(
 
 
   if (
-    score >= 5500
+    score >= 6500
   ) {
 
     return "⭐ Great Reader";
@@ -2348,7 +2673,7 @@ function getRank(
 
 
   if (
-    score >= 3500
+    score >= 4000
   ) {
 
     return "📖 Story Explorer";
@@ -2359,6 +2684,7 @@ function getRank(
   return "🥪 Journey Complete";
 
 }
+
 
 
 /* =========================================
@@ -2394,8 +2720,9 @@ restartButton.addEventListener(
 );
 
 
+
 /* =========================================
-   SOUND BUTTONS
+   SOUND
 ========================================= */
 
 soundStart.addEventListener(
@@ -2453,6 +2780,7 @@ function updateSoundButtons() {
 
 
 updateSoundButtons();
+
 
 
 /* =========================================
@@ -2707,6 +3035,7 @@ function playVictorySound() {
 }
 
 
+
 /* =========================================
    CONFETTI
 ========================================= */
@@ -2792,6 +3121,7 @@ function launchConfetti() {
 }
 
 
+
 /* =========================================
    MODALS
 ========================================= */
@@ -2816,6 +3146,7 @@ function closeModal(
   );
 
 }
+
 
 
 /* =========================================
